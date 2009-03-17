@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Juicy.WindowsService.PeriodicalTask">
+    <Position X="2.75" Y="1.25" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gAAAIAAAQCAgAAAAAAAAAACIAAgAAAAAIAAAAgAAAAA=</HashCode>
+      <FileName>PeriodicalTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.ScheduledTask">
+    <Position X="5.25" Y="0.5" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AABEAAAAQCAgBAQAABAAAAAQQAgAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ScheduledTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.BaseTask">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAIQAAAAAAgQAAAKEAAAAoAAAAAAAAAA=</HashCode>
+      <FileName>BaseTask.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,11 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Projects\Service\VHMS\deployment\vhms-service\bin\VhmsSvc.exe</StartProgram>
+    <StartArguments>VHMSSVC</StartArguments>
+    <StartWorkingDirectory>C:\Projects\Service\VHMS\deployment\vhms-service\bin\</StartWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>C:\$ergio\projects\Juicy\lib\</ReferencePath>
+  </PropertyGroup>
+</Project>

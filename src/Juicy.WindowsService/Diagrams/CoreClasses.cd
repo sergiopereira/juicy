@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Juicy.WindowsService.ServiceInstaller">
+    <Position X="7" Y="4.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>MAAEAAAIACAAAAAkAACAAAACgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ServiceInstaller.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.BaseTask">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAIQAAAAAAgQAAAKEAAAAoAAAAAAAAAA=</HashCode>
+      <FileName>BaseTask.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Juicy.WindowsService.NullTask" Collapsed="true">
+    <Position X="2.5" Y="4.25" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NullTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.ScheduledTask">
+    <Position X="4.5" Y="4.25" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAREAAAAQCAABAQAABAAAAAQQAgAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ScheduledTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.PeriodicalTask">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gAQAIAAAQCAAAAAAAAAAAACIAAgAAAAAIAAAAgAAAAA=</HashCode>
+      <FileName>PeriodicalTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.AutoUpdates.AutoUpdateTask" Collapsed="true">
+    <Position X="0.5" Y="6.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AutoUpdates\AutoUpdateTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Juicy.WindowsService.SPServiceBase">
+    <Position X="4.75" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAACAAACABAAAAEACAAgACQCgAACgAAEAAABAAAQI=</HashCode>
+      <FileName>SPServiceBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Juicy.WindowsService.ITask">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAQAAAAAAAQAAAIAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ITask.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
