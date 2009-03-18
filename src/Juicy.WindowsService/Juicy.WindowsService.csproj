@@ -61,7 +61,7 @@
     <Compile Include="BaseTask.cs" />
     <Compile Include="ITask.cs" />
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="SPServiceBase.cs">
+    <Compile Include="JuicyServiceBase.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="NullTask.cs" />
