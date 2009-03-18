@@ -17,7 +17,7 @@ using Juicy.WindowsService;
 namespace SampleService
 {
 
-    partial class MyAppService : SPServiceBase
+    partial class MyAppService : JuicyServiceBase
     {
         public const string MyAppSvcName = "MyAppSVC";
 

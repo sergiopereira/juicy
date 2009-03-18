@@ -14,7 +14,7 @@ namespace SampleService
 	{
 		static void Main(string[] args)
 		{
-			if (!SelfInstaller.ProcessIntallationRequest(args))
+			if (!SelfInstaller.ProcessInstallationRequest(args))
 			{
 
 				MyAppService svc = new MyAppService();

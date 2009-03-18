@@ -16,7 +16,7 @@ namespace Juicy.WindowsService
 	/// <summary>
 	/// Base class for Windows Services
 	/// </summary>
-	public class SPServiceBase: ServiceBase
+	public class JuicyServiceBase: ServiceBase
 	{
 		readonly static log4net.ILog Log =
 			log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -31,7 +31,7 @@ namespace Juicy.WindowsService
 		/// <summary>
 		/// Creates a new instance of the service
 		/// </summary>
-		public SPServiceBase()
+		public JuicyServiceBase()
 		{
 			// This call is required by the Windows.Forms Component Designer.
 			InitializeComponent();

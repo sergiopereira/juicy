@@ -20,9 +20,10 @@ namespace Juicy.WindowsService
 
 			this.name = name;
 			Console.WriteLine(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-			WindowsServiceConfiguration conf = ConfigurationManager.GetSection("WindowsService") as WindowsServiceConfiguration;
+			string sectionName = typeof(BaseTask).Namespace;
+			WindowsServiceConfiguration conf = ConfigurationManager.GetSection(sectionName) as WindowsServiceConfiguration;
 			if(conf == null)
-				throw new ConfigurationErrorsException("Could not find the mandatory <WindowsService /> configuration section.");
+				throw new ConfigurationErrorsException("Could not find the mandatory <" + sectionName + " /> configuration section.");
 
 			this.settings = conf.TaskSettings[name];
 		}

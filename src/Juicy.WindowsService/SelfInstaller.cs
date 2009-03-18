@@ -1,5 +1,7 @@
 ﻿using System.Configuration.Install;
 using System.Reflection;
+using System;
+using System.IO;
 
 namespace Juicy.WindowsService
 {
@@ -13,7 +15,7 @@ namespace Juicy.WindowsService
 	{
 		private static readonly string _exePath = Assembly.GetEntryAssembly().Location;
 
-		public static bool ProcessIntallationRequest(string[] programArguments)
+		public static bool ProcessInstallationRequest(string[] programArguments)
 		{
 			bool processed = false;
 
@@ -47,6 +49,7 @@ namespace Juicy.WindowsService
 		{
 			try
 			{
+				Console.WriteLine("Installing {0} as a Windows service.", Path.GetFileName(_exePath));
 				ManagedInstallerClass.InstallHelper(new string[] { _exePath });
 			}
 			catch
@@ -60,6 +63,7 @@ namespace Juicy.WindowsService
 		{
 			try
 			{
+				Console.WriteLine("Uninstalling {0} as a Windows service.", Path.GetFileName(_exePath));
 				ManagedInstallerClass.InstallHelper(new string[] { "/u", _exePath });
 			}
 			catch
