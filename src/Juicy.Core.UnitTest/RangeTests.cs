@@ -18,11 +18,10 @@ namespace Juicy.Core.UnitTest
 			Assert.AreEqual(7, ints[2]);
 		}
 
-		[Test]
-		public void ShouldNotEnumerateCollapsedRanges()
+		[Test, ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void ShouldNotAllowCollapsedRanges()
 		{
 			var ints = new IntRange(5, 4).ToList();
-			Assert.AreEqual(0, ints.Count);
 		}
 
 		[Test]
@@ -47,6 +46,50 @@ namespace Juicy.Core.UnitTest
 			Assert.AreEqual(DateTime.Today.AddMinutes(45), dates[3]);
 			Assert.AreEqual(DateTime.Today.AddMinutes(60), dates[4]);
 		}
+
+		[Test]
+		public void ShouldDetectIntersections()
+		{
+			var range1 = new IntRange(5, 7);
+
+			Assert.IsTrue(range1.Intersects(new IntRange(4, 6)));
+			Assert.IsTrue(range1.Intersects(new IntRange(6, 8)));
+			Assert.IsTrue(range1.Intersects(new IntRange(5, 7)));
+			Assert.IsTrue(range1.Intersects(new IntRange(5, 5)));
+			Assert.IsTrue(range1.Intersects(new IntRange(6, 6)));
+			Assert.IsTrue(range1.Intersects(new IntRange(7, 7)));
+
+			Assert.IsFalse(range1.Intersects(null));
+			Assert.IsFalse(range1.Intersects(new IntRange(3, 4)));
+			Assert.IsFalse(range1.Intersects(new IntRange(8, 9)));
+		}
+
+		[Test]
+		public void ShouldDetectRangeContainment()
+		{
+			var range1 = new IntRange(10, 20);
+			Assert.IsTrue(range1.Contains(new IntRange(10, 20)));
+			Assert.IsTrue(range1.Contains(new IntRange(15, 16)));
+			Assert.IsTrue(range1.Contains(new IntRange(10, 10)));
+			Assert.IsTrue(range1.Contains(new IntRange(20, 20)));
+
+			Assert.IsFalse(range1.Contains(null));
+			Assert.IsFalse(range1.Contains(new IntRange(9, 11)));
+			Assert.IsFalse(range1.Contains(new IntRange(19, 21)));
+			Assert.IsFalse(range1.Contains(new IntRange(9, 21)));
+		}
+
+		[Test]
+		public void ShouldDetectItemContainment()
+		{
+			var range1 = new IntRange(10, 20);
+			Assert.IsTrue(range1.Contains(10));
+			Assert.IsTrue(range1.Contains(15));
+			Assert.IsTrue(range1.Contains(20));
+
+			Assert.IsFalse(range1.Contains(9));
+			Assert.IsFalse(range1.Contains(21));
+		}
 	}
 
 
@@ -59,6 +102,7 @@ namespace Juicy.Core.UnitTest
 		{
 			return currentItem + 1;
 		}
+
 	}
 
 }
