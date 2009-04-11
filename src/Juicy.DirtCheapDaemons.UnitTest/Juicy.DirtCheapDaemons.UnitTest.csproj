@@ -40,12 +40,17 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\StaticFileHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Http\" />
+    <ProjectReference Include="..\Juicy.DirtCheapDaemons\Juicy.DirtCheapDaemons.csproj">
+      <Project>{97E1937F-90AC-4F0D-9833-05A9234645DA}</Project>
+      <Name>Juicy.DirtCheapDaemons</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
