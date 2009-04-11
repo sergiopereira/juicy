@@ -63,6 +63,12 @@ namespace Juicy.DirtCheapDaemons.Http
 
 		public void Shutdown()
 		{
+            if (_listener != null)
+			{
+			    _listener.Stop();
+                _listener = null;
+			}
+
 			if (_serverThread != null)
 			{
 				_serverThread.Abort();
@@ -125,6 +131,11 @@ namespace Juicy.DirtCheapDaemons.Http
 					{
 						Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
 						string reqText = GetRequestText(socket);
+                        if(string.IsNullOrEmpty(reqText))
+                        {
+                            socket.Close();
+                            continue;
+                        }
 					    string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
 
                         //(starting n the next line is what a GET request looks like, line break = \r\n                                                
@@ -160,32 +171,6 @@ namespace Juicy.DirtCheapDaemons.Http
 								continue;
                                 //TODO: return an error code here
 							}
-
-							// Look for HTTP request
-							//int iStartPos = reqText.IndexOf("HTTP", 1);
-							// Get the HTTP text and version e.g. it will return "HTTP/1.1"
-							//string sHttpVersion = reqText.Substring(iStartPos, 8);
-
-							// Extract the Requested Type and Requested file/directory
-							//string sRequest = reqText.Substring(0, iStartPos - 1);
-
-							//Replace backslash with Forward Slash, if Any
-							//sRequest.Replace("\\", "/");
-
-							//If file name is not supplied add forward slash to indicate 
-							//that it is a directory and then we will look for the 
-							//default file name..
-							//if ((sRequest.IndexOf(".") < 1) && (!sRequest.EndsWith("/")))
-							//{
-							//	sRequest = sRequest + "/";
-						    //}
-
-							//Extract the requested file name
-							//iStartPos = sRequest.LastIndexOf("/") + 1;
-							//string sRequestedFile = sRequest.Substring(iStartPos);
-
-							//Extract The directory Name
-							//string sDirName = sRequest.Substring(sRequest.IndexOf("/"), sRequest.LastIndexOf("/") - 3);
 
 							mount = FindHandler(vpath);
 						    handler = mount.Handler;
@@ -243,17 +228,25 @@ namespace Juicy.DirtCheapDaemons.Http
 			}
 		}
 
-        private Response CreateResponse(int statusCode, string statusMessage)
+	    private Response CreateResponse(int statusCode, string statusMessage)
         {
             var response = new Response
                 {
                     StatusCode = statusCode,
                     StatusMessage = statusMessage
                 };
+            //add some standard headers that can be replaced by 
+            // the handler if needed
 
+            response.Headers["Cache-Control"] = "private";
+	        response.Headers[""] = "text/html; charset=utf-8";
+	        response.Headers["Server"] = "Juicy/1.0";
+	        response.Headers["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
             
             return response;
         }
+
+
 
         private Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
         {
@@ -304,8 +297,44 @@ namespace Juicy.DirtCheapDaemons.Http
 		{
 			//TODO: send headers
             //TODO: take care of text encoding... assuming ASCII is no good
-			string body = response.GetResponseBodyText();
-			socket.Send(Encoding.ASCII.GetBytes(body));
+            socket.Send(Encoding.UTF8.GetBytes(
+                string.Format("HTTP/1.1 {0} {1}\r\n", response.StatusCode, response.StatusMessage)
+                )); //end of headers
+            
+            
+            string body = response.GetResponseBodyText();
+		    var buffer = Encoding.UTF8.GetBytes(body);
+            
+            AddHeaders(response, socket);
+            SendHeader("Content-Length", buffer.Length.ToString(), socket);
+		    
+            socket.Send(Encoding.UTF8.GetBytes("\r\n")); //end of headers
+
+		    socket.Send(buffer);
 		}
+
+        private void AddHeaders(IResponse response, Socket socket)
+        {
+            /*
+            Cache-Control	private
+            Content-Type	text/html; charset=utf-8
+            Content-Encoding	gzip
+            Expires	Sat, 11 Apr 2009 16:06:57 GMT
+            Vary	Accept-Encoding
+            Server	Microsoft-IIS/7.0
+            Date	Sat, 11 Apr 2009 16:06:57 GMT
+            Content-Length	12772
+             */
+
+            foreach (var h in response.Headers) 
+            {
+                SendHeader(h.Key, h.Value, socket);
+            }
+        }
+
+        private void SendHeader(string name, string value, Socket socket)
+        {
+            socket.Send(Encoding.UTF8.GetBytes(string.Format("{0}: {1}\r\n", name, value)));
+        }
 	}
 }

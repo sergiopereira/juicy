@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using NUnit.Framework;
 using Juicy.DirtCheapDaemons.Http;
@@ -37,6 +39,15 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
             Assert.AreEqual(@"c:\webroot\dir\file.html", handler.FindRequestedPhysicalPath(req));
         }
 
+        private static string GetResponseBodyFromUrl(string url)
+        {
+            var request = WebRequest.Create(url);
+            using (var response = request.GetResponse())
+            using (var sr = new StreamReader(response.GetResponseStream())) {
+                return sr.ReadToEnd();
+            }
+
+        }
 
     }
 }
