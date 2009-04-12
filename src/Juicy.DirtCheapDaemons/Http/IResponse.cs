@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
@@ -7,7 +8,7 @@ namespace Juicy.DirtCheapDaemons.Http
 	{
 		TextWriter Output { get;  }
 		IDictionary<string, string> Headers { get; }
-		int StatusCode { get; set; }
+		HttpStatusCode StatusCode { get; set; }
 		string StatusMessage { get; set; }
 	}
 }

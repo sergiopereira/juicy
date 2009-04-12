@@ -27,8 +27,24 @@ namespace Juicy.DirtCheapDaemons.Http
 			PortNumber = portNumber;
 		}
 
-		public int PortNumber { get; set; }
+		private bool IsRunning { get { return _serverThread != null; } }
+
+		private int _portNumber;
+		public int PortNumber
+		{
+			get { return _portNumber; }
+			set
+			{
+				if(IsRunning)
+				{
+					throw new InvalidOperationException("Cannot change the port number after the server has been started.");
+				}
+				_portNumber = value;
+			}
+		}
+
 		public IList<MountPoint> MountPoints { get; private set; }
+        public string RootUrl { get { return string.Format("http://localhost:{0}/", PortNumber); } }
 
 		public void Mount(string virtualDir, string physicalDirectory)
 		{
@@ -45,8 +61,21 @@ namespace Juicy.DirtCheapDaemons.Http
             MountPoints.Add(new MountPoint {VirtualPath = virtualDir, Handler = handler});
 		}
 
+        public void Unmount(string virtualDir)
+        {
+            var mount = MountPoints.FirstOrDefault(m => m.VirtualPath.Equals(virtualDir, StringComparison.OrdinalIgnoreCase));
+            if(mount != null)
+            {
+                MountPoints.Remove(mount);
+            }
+        }
 
-		public void Start()
+        public void UnmountAll()
+        {
+            MountPoints.Clear();
+        }
+
+	    public void Start()
 		{
 			Shutdown();
 			var host = Dns.GetHostEntry("localhost");
@@ -78,7 +107,7 @@ namespace Juicy.DirtCheapDaemons.Http
 
 		public bool Ping()
 		{
-			using (var cli = new TcpClient())//"localhost", PortNumber))
+			using (var cli = new TcpClient())
 			{
 				cli.Connect("localhost", PortNumber);
 				var startTime = DateTime.Now;
@@ -126,13 +155,13 @@ namespace Juicy.DirtCheapDaemons.Http
 				//Accept a new connection
 				using (var socket = _listener.AcceptSocket())
 				{
-					//Console.WriteLine("Socket Type " + mySocket.SocketType);
 					if (socket.Connected)
 					{
 						Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
 						string reqText = GetRequestText(socket);
                         if(string.IsNullOrEmpty(reqText))
                         {
+							Console.WriteLine("Empty request, canceling.");
                             socket.Close();
                             continue;
                         }
@@ -165,6 +194,7 @@ namespace Juicy.DirtCheapDaemons.Http
 						    string[] httpCommand = lines[0].Split(' ');
 						    var httpVerb = httpCommand[0];
 						    vpath = httpCommand[1];
+							Console.WriteLine("Requested path:" + vpath);
 
                             if (!ValidateHttpVerb(httpVerb))
 							{
@@ -174,10 +204,12 @@ namespace Juicy.DirtCheapDaemons.Http
 
 							mount = FindHandler(vpath);
 						    handler = mount.Handler;
+							Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
+							                  vpath, handler);
 						}
 
 					    var request = CreateRequest(lines, mount, vpath);
-                        var response = CreateResponse(200, "OK");
+						var response = CreateResponse(HttpStatusCode.OK, "OK");
 					    handler.Respond(request, response);
                         SendResponse(response, socket);
 
@@ -228,13 +260,14 @@ namespace Juicy.DirtCheapDaemons.Http
 			}
 		}
 
-	    private static Response CreateResponse(int statusCode, string statusMessage)
+		private static Response CreateResponse(HttpStatusCode statusCode, string statusMessage)
         {
             var response = new Response
                 {
                     StatusCode = statusCode,
                     StatusMessage = statusMessage
                 };
+
             //add some standard headers that can be replaced by 
             // the handler if needed
 
@@ -290,7 +323,7 @@ namespace Juicy.DirtCheapDaemons.Http
 	        var mountedPoint =
 	            mounts.FirstOrDefault(p => requestedVirtualDir.StartsWith(p.VirtualPath, StringComparison.OrdinalIgnoreCase));
             //TODO: if path not mounted, return error code
-            return mountedPoint;
+			return mountedPoint ?? new MountPoint { VirtualPath = "/", Handler = new ResourceNotFoundHandler() };
 		}
 
 		private void SendResponse(Response response, Socket socket)
@@ -298,7 +331,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			//TODO: send headers
             //TODO: take care of text encoding... assuming ASCII is no good
             socket.Send(Encoding.UTF8.GetBytes(
-                string.Format("HTTP/1.1 {0} {1}\r\n", response.StatusCode, response.StatusMessage)
+                string.Format("HTTP/1.1 {0} {1}\r\n", (int)response.StatusCode, response.StatusMessage)
                 )); //end of headers
             
             

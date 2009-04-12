@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net;
 using System.IO;
-using System.Web;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
@@ -17,7 +15,7 @@ namespace Juicy.DirtCheapDaemons.Http
 
 		public TextWriter Output { get; private set; }
 		public IDictionary<string,string> Headers { get; private set; }
-		public int StatusCode { get; set; }
+		public HttpStatusCode StatusCode { get; set; }
 		public string StatusMessage { get; set; }
 		public string GetResponseBodyText()
 		{

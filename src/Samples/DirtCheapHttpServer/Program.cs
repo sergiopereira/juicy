@@ -33,7 +33,10 @@ namespace DirtCheapHttpServer
 
 	        //this will serve static files
 	        var testWebRoot = Path.GetFullPath(@"..\..\webroot");
-	        server.Mount("/test", testWebRoot);
+			server.Mount("/test", testWebRoot);
+
+			//a "hidden" path
+			server.Mount("/hidden", new ResourceNotFoundHandler());
 
 	        //this path shows that more specific paths take precedence
 	        server.Mount("/test/notafile.aspx", 
