@@ -54,7 +54,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			_listener = new TcpListener(localIP, PortNumber);
 			_listener.Start();
 
-			_serverThread = new Thread(new ThreadStart(WaitForConnection));
+			_serverThread = new Thread(WaitForConnection);
 			_serverThread.Start();
 
 			Console.WriteLine("Juicy Web Server ready on port " + PortNumber + ". ");
@@ -228,7 +228,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			}
 		}
 
-	    private Response CreateResponse(int statusCode, string statusMessage)
+	    private static Response CreateResponse(int statusCode, string statusMessage)
         {
             var response = new Response
                 {
@@ -239,7 +239,7 @@ namespace Juicy.DirtCheapDaemons.Http
             // the handler if needed
 
             response.Headers["Cache-Control"] = "private";
-	        response.Headers[""] = "text/html; charset=utf-8";
+	        response.Headers["Content-Type"] = "text/html; charset=utf-8";
 	        response.Headers["Server"] = "Juicy/1.0";
 	        response.Headers["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
             
@@ -248,7 +248,7 @@ namespace Juicy.DirtCheapDaemons.Http
 
 
 
-        private Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
+        private static Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
         {
             var request = new Request {MountPoint = mount, VirtualPath = vpath};
             //copy the headers to the request object
@@ -313,7 +313,7 @@ namespace Juicy.DirtCheapDaemons.Http
 		    socket.Send(buffer);
 		}
 
-        private void AddHeaders(IResponse response, Socket socket)
+        private static void AddHeaders(IResponse response, Socket socket)
         {
             /*
             Cache-Control	private
@@ -332,7 +332,7 @@ namespace Juicy.DirtCheapDaemons.Http
             }
         }
 
-        private void SendHeader(string name, string value, Socket socket)
+        private static void SendHeader(string name, string value, Socket socket)
         {
             socket.Send(Encoding.UTF8.GetBytes(string.Format("{0}: {1}\r\n", name, value)));
         }

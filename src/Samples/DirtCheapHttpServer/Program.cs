@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Juicy.DirtCheapDaemons.Http;
-using System.Net;
 
 namespace DirtCheapHttpServer
 {
@@ -25,7 +24,11 @@ namespace DirtCheapHttpServer
 	        //this responds with content programmatically created
 	        server.Mount(
 	            "/", 
-	            (req, resp) => resp.Output.Write("<h1>Welcome to the Juicy Web Server</h1>")
+	            (req, resp) => resp.Output.Write(@"
+					<h1>Welcome to the Juicy Web Server</h1>
+					<a href=""test/page1.html"">Static Page</a><br>
+					<a href=""test/subdir/page2.html"">Static Page in subdirectory</a><br>
+					<a href=""test/notafile.aspx"">Dynamic page</a><br>")
 	            );
 
 	        //this will serve static files
@@ -34,7 +37,7 @@ namespace DirtCheapHttpServer
 
 	        //this path shows that more specific paths take precedence
 	        server.Mount("/test/notafile.aspx", 
-	                     (req, resp) => resp.Output.Write("<h1>notafile.aspx is dynamically created</h1>"));
+	                     (req, resp) => resp.Output.Write("<h1>notafile.aspx is dynamically created</h1><a href=\"/\">Home</a>"));
 
 	        Console.WriteLine("Press enter to stop server");
 	        Console.ReadLine();
