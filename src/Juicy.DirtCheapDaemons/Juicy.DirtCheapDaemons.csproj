@@ -49,6 +49,7 @@
     <Compile Include="Http\IResponse.cs" />
     <Compile Include="Http\MountPoint.cs" />
     <Compile Include="Http\IMountPointHandler.cs" />
+    <Compile Include="Http\MountPointResolver.cs" />
     <Compile Include="Http\PingHandler.cs" />
     <Compile Include="Http\ResourceNotFoundHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,6 +15,7 @@ namespace Juicy.DirtCheapDaemons.Http
 		public const int DefaultPortNumber = 8081;
 		private TcpListener _listener;
 		private Thread _serverThread;
+		private MountPointResolver _resolver = new MountPointResolver();
 
 		public HttpServer()
 			: this(DefaultPortNumber)
@@ -317,48 +318,31 @@ namespace Juicy.DirtCheapDaemons.Http
 
         private MountPoint FindHandler(string requestedVirtualDir)
 		{
-	        var mounts = from point in MountPoints
-                               orderby point.VirtualPath descending 
-	                           select point;
-	        var mountedPoint =
-	            mounts.FirstOrDefault(p => requestedVirtualDir.StartsWith(p.VirtualPath, StringComparison.OrdinalIgnoreCase));
-            //TODO: if path not mounted, return error code
-			return mountedPoint ?? new MountPoint { VirtualPath = "/", Handler = new ResourceNotFoundHandler() };
+			return _resolver.Resolve(MountPoints, requestedVirtualDir) 
+				??
+				new MountPoint { VirtualPath = "/", Handler = new ResourceNotFoundHandler() };
 		}
 
 		private void SendResponse(Response response, Socket socket)
 		{
-			//TODO: send headers
-            //TODO: take care of text encoding... assuming ASCII is no good
             socket.Send(Encoding.UTF8.GetBytes(
                 string.Format("HTTP/1.1 {0} {1}\r\n", (int)response.StatusCode, response.StatusMessage)
-                )); //end of headers
+                ));
             
             
             string body = response.GetResponseBodyText();
 		    var buffer = Encoding.UTF8.GetBytes(body);
-            
-            AddHeaders(response, socket);
-            SendHeader("Content-Length", buffer.Length.ToString(), socket);
+
+			response.Headers["Content-Length"] = buffer.Length.ToString();
+            SendAllHeaders(response, socket);
 		    
             socket.Send(Encoding.UTF8.GetBytes("\r\n")); //end of headers
 
 		    socket.Send(buffer);
 		}
 
-        private static void AddHeaders(IResponse response, Socket socket)
+        private static void SendAllHeaders(IResponse response, Socket socket)
         {
-            /*
-            Cache-Control	private
-            Content-Type	text/html; charset=utf-8
-            Content-Encoding	gzip
-            Expires	Sat, 11 Apr 2009 16:06:57 GMT
-            Vary	Accept-Encoding
-            Server	Microsoft-IIS/7.0
-            Date	Sat, 11 Apr 2009 16:06:57 GMT
-            Content-Length	12772
-             */
-
             foreach (var h in response.Headers) 
             {
                 SendHeader(h.Key, h.Value, socket);

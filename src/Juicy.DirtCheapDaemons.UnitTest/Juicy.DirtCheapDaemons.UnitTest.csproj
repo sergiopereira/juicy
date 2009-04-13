@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Http\HttpServerTest.cs" />
+    <Compile Include="Http\MontPointResolverTests.cs" />
     <Compile Include="Http\StaticFileHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

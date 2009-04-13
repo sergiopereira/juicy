@@ -39,7 +39,7 @@ namespace Juicy.DirtCheapDaemons.Http
                 return Path.Combine(PhysicalDirectory, subPhysPath);
             }
 
-            throw new ArgumentException("How the heck did was this handler invoked? Bug.");
+            throw new ArgumentOutOfRangeException("request", "How the heck did was this handler invoked? Bug.");
         }
 	}
 }

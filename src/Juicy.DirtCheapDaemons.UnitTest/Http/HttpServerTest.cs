@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using Juicy.DirtCheapDaemons.Http;
 using NUnit.Framework;
 
@@ -31,9 +29,7 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
         public void ShouldReturnTheServerRootUrl()
         {
             _server.PortNumber = 8123;
-            //_server.Start();
-
-            string url = "http://localhost:8123/";  
+            const string url = "http://localhost:8123/";  
             Assert.AreEqual(url, _server.RootUrl);
         }
 
@@ -68,8 +64,9 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
     	{
     		//_server.Mount("/test", (req, resp) => resp.Output.WriteLine("not important"));
 			_server.Start();
-    		var code = GetResponseStatusCode(_server.RootUrl + "some/crazy/path");
-			Assert.AreEqual(HttpStatusCode.NotFound, code);
+
+    		var code =  GetResponseStatusCode(_server.RootUrl + "some/crazy/path");
+    		Assert.AreEqual(HttpStatusCode.NotFound, code);
     	}
 
         private static string GetResponseBodyFromUrl(string url)
@@ -84,10 +81,16 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		private static HttpStatusCode GetResponseStatusCode(string url)
 		{
 			var request = WebRequest.Create(url);
-			using (var response = (HttpWebResponse) request.GetResponse())
+			try
 			{
-				//using (var sr = new StreamReader(response.GetResponseStream())) {
-				return response.StatusCode;
+				using (var response = (HttpWebResponse) request.GetResponse())
+				{
+					return response.StatusCode;
+				}
+			}
+			catch(WebException ex)
+			{
+				return ((HttpWebResponse) ex.Response).StatusCode;
 			}
 		}
     }
