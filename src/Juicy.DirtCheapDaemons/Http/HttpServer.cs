@@ -150,114 +150,82 @@ namespace Juicy.DirtCheapDaemons.Http
 
 		public void WaitForConnection()
 		{
-
-			while (true)
+			try
 			{
-				//Accept a new connection
-				using (var socket = _listener.AcceptSocket())
+
+
+				while (true)
 				{
-					if (socket.Connected)
+					//Accept a new connection
+					using (var socket = _listener.AcceptSocket())
 					{
-						Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
-						string reqText = GetRequestText(socket);
-                        if(string.IsNullOrEmpty(reqText))
-                        {
-							Console.WriteLine("Empty request, canceling.");
-                            socket.Close();
-                            continue;
-                        }
-					    string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
-
-                        //(starting n the next line is what a GET request looks like, line break = \r\n                                                
-                        //GET /some/path/in/the/server.html HTTP/1.1
-                        //Host: localhost:8081
-                        //User-Agent: Mozilla/5.0 (blah blah blah)
-                        //Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-                        //Accept-Language: en-us,en;q=0.5
-                        //Accept-Encoding: gzip,deflate
-                        //Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
-                        //Keep-Alive: 300
-                        //Connection: keep-alive
-                        //Cookie: cookie1=val1; cookie2=val2;
-
-					    MountPoint mount = null;
-						IMountPointHandler handler;
-					    string vpath = null;
-
-						if (PingHandler.IsPing(reqText))
+						if (socket.Connected)
 						{
-							//this is not HTTP.. just our custom ping request
-							handler = new PingHandler();
-						}
-						else
-						{
-							//so this must be an HTTP request
-						    string[] httpCommand = lines[0].Split(' ');
-						    var httpVerb = httpCommand[0];
-						    vpath = httpCommand[1];
-							Console.WriteLine("Requested path:" + vpath);
-
-                            if (!ValidateHttpVerb(httpVerb))
+							Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
+							string reqText = GetRequestText(socket);
+							if (string.IsNullOrEmpty(reqText))
 							{
+								Console.WriteLine("Empty request, canceling.");
+								socket.Close();
 								continue;
-                                //TODO: return an error code here
+							}
+							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+
+							//(starting n the next line is what a GET request looks like, line break = \r\n                                                
+							//GET /some/path/in/the/server.html HTTP/1.1
+							//Host: localhost:8081
+							//User-Agent: Mozilla/5.0 (blah blah blah)
+							//Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+							//Accept-Language: en-us,en;q=0.5
+							//Accept-Encoding: gzip,deflate
+							//Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+							//Keep-Alive: 300
+							//Connection: keep-alive
+							//Cookie: cookie1=val1; cookie2=val2;
+
+							MountPoint mount = null;
+							IMountPointHandler handler;
+							string vpath = null;
+
+							if (PingHandler.IsPing(reqText))
+							{
+								//this is not HTTP.. just our custom ping request
+								handler = new PingHandler();
+							}
+							else
+							{
+								//so this must be an HTTP request
+								string[] httpCommand = lines[0].Split(' ');
+								var httpVerb = httpCommand[0];
+								vpath = httpCommand[1];
+								Console.WriteLine("Requested path:" + vpath);
+
+								if (!ValidateHttpVerb(httpVerb))
+								{
+									continue;
+									//TODO: return an error code here
+								}
+
+								mount = FindHandler(vpath);
+								handler = mount.Handler;
+								Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
+								                  vpath, handler);
 							}
 
-							mount = FindHandler(vpath);
-						    handler = mount.Handler;
-							Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
-							                  vpath, handler);
+							var request = CreateRequest(lines, mount, vpath);
+							var response = CreateResponse(HttpStatusCode.OK, "OK");
+							handler.Respond(request, response);
+							SendResponse(response, socket);
+
+							socket.Close();
 						}
-
-					    var request = CreateRequest(lines, mount, vpath);
-						var response = CreateResponse(HttpStatusCode.OK, "OK");
-					    handler.Respond(request, response);
-                        SendResponse(response, socket);
-
-						socket.Close();
-
-					    #region old code
-
-
-					    //if (sRequestedFile.Length == 0)
-					    //{
-					    //    // Get the default filename
-					    //    sRequestedFile = GetTheDefaultFileName(sLocalDir);
-					    //    if (sRequestedFile == "")
-					    //    {
-					    //        sErrorMessage = "<H2>Error!! No Default File Name Specified</H2>";
-					    //        SendHeader(sHttpVersion, "", sErrorMessage.Length, " 404 Not Found", ref socket);
-					    //        SendToBrowser(sErrorMessage, ref socket);
-					    //        socket.Close();
-					    //        return;
-					    //    }
-					    //}
-						
-                        
-					    //    int iTotBytes = 0;
-					    //    sResponse = "";
-					    //    FileStream fs = new FileStream(sPhysicalFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-					    //    // Create a reader that can read bytes from the FileStream.
-					    //    BinaryReader reader = new BinaryReader(fs);
-					    //    byte[] bytes = new byte[fs.Length];
-					    //    int read;
-					    //    while ((read = reader.Read(bytes, 0, bytes.Length)) != 0)
-					    //    {
-					    //        // Read from the file and write the data to the network
-					    //        sResponse = sResponse + Encoding.ASCII.GetString(bytes, 0, read);
-					    //        iTotBytes = iTotBytes + read;
-					    //    }
-					    //    reader.Close();
-					    //    fs.Close();
-					    //    SendHeader(sHttpVersion, sMimeType, iTotBytes, " 200 OK", ref socket);
-					    //    SendToBrowser(bytes, ref socket);
-
-
-					    #endregion
-
 					}
+					Thread.Sleep(50);
 				}
-				Thread.Sleep(50);
+			}
+			catch(SocketException)
+			{
+				
 			}
 		}
 
