@@ -59,15 +59,40 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
     		_server.PortNumber = 1234;
     	}
 
-    	[Test]
-    	public void ShouldReturn404ForUnhandledPath()
-    	{
-    		//_server.Mount("/test", (req, resp) => resp.Output.WriteLine("not important"));
+		[Test]
+		public void ShouldReturn404ForUnhandledPath()
+		{
+			//_server.Mount("/test", (req, resp) => resp.Output.WriteLine("not important"));
 			_server.Start();
 
-    		var code =  GetResponseStatusCode(_server.RootUrl + "some/crazy/path");
-    		Assert.AreEqual(HttpStatusCode.NotFound, code);
-    	}
+			var code = GetResponseStatusCode(_server.RootUrl + "some/crazy/path");
+			Assert.AreEqual(HttpStatusCode.NotFound, code);
+		}
+
+		[Test]
+		
+		public void ShouldParseQueryString()
+		{
+			_server.Start();
+			string p1 = null, p2 = null;
+			int count = 0;
+			_server.Mount("/testdir", (req, resp) =>
+			{
+				//I tried using Asserts here but it would lock on failures... 
+				//  maybe a threading issue? Did not investigate yet.
+				p1 = req.QueryString["p1"];
+				p2 = req.QueryString["p2"];
+				count = req.QueryString.Count;
+			});
+
+			var body = GetResponseBodyFromUrl(_server.RootUrl + "testdir?p1=val1&p2=val2");
+
+			Assert.AreEqual("val1", p1);
+			Assert.AreEqual("val2", p2);
+			Assert.AreEqual(2, count);
+		}
+
+		
 
         private static string GetResponseBodyFromUrl(string url)
         {

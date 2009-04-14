@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Juicy.DirtCheapDaemons.UnitTest.Http
 {
 	[TestFixture]
-	public class MontPointResolverTests
+	public class MountPointResolverTests
 	{
 		[Test]
 		public void ShouldFindWithoutExtension()
@@ -75,5 +75,24 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			MountPoint mount = resolver.Resolve(mounts, "/non-existing-path");
 				Assert.IsNull(mount);			
 		}
+
+		[Test]
+		public void ShouldFindWhenQuerystringIsGiven()
+		{
+			Assert.IsTrue(MountPointResolver.MountContainsPath(
+							new MountPoint { Handler = null, VirtualPath = "/dir/name" },
+							"/dir/name?q=abc")
+						);
+		}
+
+		[Test]
+		public void ShouldFindWhenAnchorIsGiven()
+		{
+			Assert.IsTrue(MountPointResolver.MountContainsPath(
+							new MountPoint { Handler = null, VirtualPath = "/dir/name" },
+							"/dir/name#anchor")
+						);
+		}
+
 	}
 }

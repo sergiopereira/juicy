@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
@@ -8,7 +9,6 @@ namespace Juicy.DirtCheapDaemons.Http
         MountPoint MountPoint { get;} 
 		string VirtualPath { get; }
         IDictionary<string, string> Headers { get; }
-        //string FullPath { get; }
-		//Uri Uri { get;  }
+		NameValueCollection QueryString { get; }
 	}
 }

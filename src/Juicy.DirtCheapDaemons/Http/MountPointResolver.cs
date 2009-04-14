@@ -30,7 +30,10 @@ namespace Juicy.DirtCheapDaemons.Http
 					return true;
 				}
 				var remainingPath = virtualPath.Substring(mount.VirtualPath.Length);
-				return remainingPath.Length == 0 || remainingPath[0] == '/';
+				return remainingPath.Length == 0 || 
+					remainingPath[0] == '/' || 
+					remainingPath[0] == '?' || 
+					remainingPath[0] == '#';
 			}
 
 			return false;

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
+using System.Web;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
@@ -262,6 +263,11 @@ namespace Juicy.DirtCheapDaemons.Http
                         }
                     }
                 });
+			if (vpath.IndexOf("?") >= 0)
+			{
+				var query = vpath.Substring(vpath.IndexOf("?"));
+				request.QueryString = HttpUtility.ParseQueryString(query);
+			}
             return request;
         }
 
