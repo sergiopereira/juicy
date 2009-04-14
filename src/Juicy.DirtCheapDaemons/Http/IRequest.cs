@@ -8,7 +8,7 @@ namespace Juicy.DirtCheapDaemons.Http
 	{
         MountPoint MountPoint { get;} 
 		string VirtualPath { get; }
-        IDictionary<string, string> Headers { get; }
+        string this[string headerName] { get; }
 		NameValueCollection QueryString { get; }
 	}
 }

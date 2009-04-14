@@ -241,10 +241,10 @@ namespace Juicy.DirtCheapDaemons.Http
             //add some standard headers that can be replaced by 
             // the handler if needed
 
-            response.Headers["Cache-Control"] = "private";
-	        response.Headers["Content-Type"] = "text/html; charset=utf-8";
-	        response.Headers["Server"] = "Juicy/1.0";
-	        response.Headers["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
+            response["Cache-Control"] = "private";
+	        response["Content-Type"] = "text/html; charset=utf-8";
+	        response["Server"] = "Juicy/1.0";
+	        response["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
             
             return response;
         }
@@ -259,7 +259,7 @@ namespace Juicy.DirtCheapDaemons.Http
                     if (!string.IsNullOrEmpty(line)) {
                         int pos = line.IndexOf(":");
                         if (pos > 0) {
-                            request.Headers.Add(line.Substring(0, pos), line.Substring(pos + 1));
+							request[line.Substring(0, pos)] = line.Substring(pos + 1);
                         }
                     }
                 });
@@ -307,7 +307,7 @@ namespace Juicy.DirtCheapDaemons.Http
             string body = response.GetResponseBodyText();
 		    var buffer = Encoding.UTF8.GetBytes(body);
 
-			response.Headers["Content-Length"] = buffer.Length.ToString();
+			response["Content-Length"] = buffer.Length.ToString();
             SendAllHeaders(response, socket);
 		    
             socket.Send(Encoding.UTF8.GetBytes("\r\n")); //end of headers

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Juicy.DirtCheapDaemons.Http;
+using System.Threading;
 
 namespace DirtCheapHttpServer
 {
@@ -8,12 +9,32 @@ namespace DirtCheapHttpServer
 	{
 		static void Main(string[] args)
 		{
-			RunWebServer();
-		    
+			//RunWebServer();
 
+			Temp();
 		    Console.WriteLine("Press enter");
 			Console.ReadLine();
            
+		}
+
+		private static void Temp()
+		{
+			HttpServer server = new HttpServer { PortNumber = 2000 };
+			server.Start();
+
+			server.Mount("/getData",
+				(req, resp) =>
+				{
+					resp.Output.Write("{result: 'ok', accountId: 123}");
+					resp["Content-Type"] = "application/json";
+					var delay = int.Parse(req.QueryString["delay"] ?? "0");
+					Thread.Sleep(1000 * delay);
+				}
+			);
+
+			Console.WriteLine("Press enter to stop server");
+			Console.ReadLine();
+			server.Shutdown();
 		}
 
 	    private static void RunWebServer()
