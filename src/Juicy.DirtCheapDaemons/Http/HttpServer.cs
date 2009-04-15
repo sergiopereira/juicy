@@ -21,11 +21,11 @@ namespace Juicy.DirtCheapDaemons.Http
 		public HttpServer()
 			: this(DefaultPortNumber)
 		{
-			MountPoints = new List<MountPoint>();
 		}
 
 		public HttpServer(int portNumber)
 		{
+			MountPoints = new List<MountPoint>();
 			PortNumber = portNumber;
 		}
 

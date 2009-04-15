@@ -26,6 +26,13 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
         }
 		
         [Test]
+        public void ShouldInitializeMountPointsOnNonDefaultCtor_BUG()
+        {
+			_server = new HttpServer(8181);
+			Assert.IsNotNull(_server.MountPoints);
+        }
+
+        [Test]
         public void ShouldReturnTheServerRootUrl()
         {
             _server.PortNumber = 8123;
