@@ -1,7 +1,4 @@
 using System;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Juicy.WindowsService
@@ -23,7 +20,7 @@ namespace Juicy.WindowsService
 			: base(name)
 		{
 			string time = "00:00";
-			if(this.Settings.TaskProperties.ContainsKey("time") )
+			if (this.Settings.TaskProperties.ContainsKey("time"))
 				time = this.Settings.TaskProperties["time"];
 
 			this.scheduledTime = TimeSpan.Parse(time);
@@ -36,7 +33,7 @@ namespace Juicy.WindowsService
 		/// <summary>
 		/// The time of the day when the task will run
 		/// </summary>
-		public TimeSpan ScheduledTime { get { return scheduledTime; } }	
+		public TimeSpan ScheduledTime { get { return scheduledTime; } }
 		private TimeSpan scheduledTime = TimeSpan.MinValue;
 
 		private readonly static Random rnd = new Random();
@@ -49,7 +46,7 @@ namespace Juicy.WindowsService
 			base.Start();
 			//check every 2 minutes (approximately, to avoid coincidences with other tasks)
 			int interval = 1000 * rnd.Next(115, 125);
-			if(this.scheduledTime != TimeSpan.MinValue)
+			if (this.scheduledTime != TimeSpan.MinValue)
 				_timer = new Timer(new TimerCallback(timer_Elapsed), null, 100, interval);
 		}
 
@@ -60,10 +57,10 @@ namespace Juicy.WindowsService
 		{
 			base.Stop();
 			//kill the timer
-			if(_timer != null)
+			if (_timer != null)
 			{
 				_timer.Dispose();
-				_timer= null;
+				_timer = null;
 			}
 		}
 
@@ -86,26 +83,26 @@ namespace Juicy.WindowsService
 
 		private void timer_Elapsed(object state)
 		{
-			if(!this.Started) return;
+			if (!this.Started) return;
 
 			TimeSpan diff = DateTime.Now - LastProcessedDate;
 
-			if(diff.TotalHours >= 24)
+			if (diff.TotalHours >= 24)
 			{
 				//looks like it's time to run again
 				Log.DebugFormat("Time to execute task {0}" + this.Name);
 
-				if(!this.Enabled)
+				if (!this.Enabled)
 				{
 					Log.InfoFormat("Task {0} is disabled and will not execute." + this.Name);
 					return;
 				}
 
-				lock(this)
+				lock (this)
 				{
 					//double check
 					diff = DateTime.Now - LastProcessedDate;
-					if(diff.TotalHours >= 24)
+					if (diff.TotalHours >= 24)
 					{
 						//flag it as executed at the scheduled time today
 						this.UpdateProcessedDate();
@@ -114,20 +111,20 @@ namespace Juicy.WindowsService
 
 				//NOTE: we will run this outside the lock() because
 				// we never know how long Execute() takes to complete
-				if(diff.TotalHours >= 24)
+				if (diff.TotalHours >= 24)
 				{
 					try
 					{
 						this.Execute();
 					}
-					catch(Exception ex)
+					catch (Exception ex)
 					{
 						//we will log and supress this exception otherwise the
 						// whole windows service process comes crashing down
 						Log.Warn("The task " + this.Name + " did not handle an exception.", ex);
 					}
 				}
-				
+
 			}
 		}
 

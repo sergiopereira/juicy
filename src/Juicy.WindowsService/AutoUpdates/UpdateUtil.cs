@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.IO;
-using System.Text;
 
 namespace Juicy.WindowsService.AutoUpdates
 {

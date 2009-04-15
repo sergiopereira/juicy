@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Juicy.WindowsService;
 
 namespace SampleService.Tasks

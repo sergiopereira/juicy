@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
 	public interface IRequest
 	{
-        MountPoint MountPoint { get;} 
+		MountPoint MountPoint { get; }
 		string VirtualPath { get; }
-        string this[string headerName] { get; }
+		string this[string headerName] { get; }
 		NameValueCollection QueryString { get; }
 	}
 }

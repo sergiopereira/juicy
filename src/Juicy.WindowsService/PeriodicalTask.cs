@@ -1,7 +1,5 @@
 using System;
-using System.Configuration;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Juicy.WindowsService
@@ -9,7 +7,7 @@ namespace Juicy.WindowsService
 	/// <summary>
 	/// A background task that runs periodically
 	/// </summary>
-	public abstract class PeriodicalTask: BaseTask
+	public abstract class PeriodicalTask : BaseTask
 	{
 
 		readonly static log4net.ILog Log =
@@ -22,7 +20,7 @@ namespace Juicy.WindowsService
 			: base(name)
 		{
 			string seconds = "0";
-			if(this.Settings.TaskProperties.ContainsKey("interval"))
+			if (this.Settings.TaskProperties.ContainsKey("interval"))
 				seconds = this.Settings.TaskProperties["interval"];
 
 			this.interval = int.Parse(seconds);
@@ -35,7 +33,7 @@ namespace Juicy.WindowsService
 		/// <summary>
 		/// Interval in seconds between each execution
 		/// </summary>
-		public int IntervalSeconds{get{return interval;}}
+		public int IntervalSeconds { get { return interval; } }
 		private int interval;
 
 		/// <summary>
@@ -60,17 +58,17 @@ namespace Juicy.WindowsService
 
 		private void StartTimer()
 		{
-			if(interval > 0)
-				_timer = new Timer(new TimerCallback(timer_Elapsed), null, 100, 1000*interval);
+			if (interval > 0)
+				_timer = new Timer(new TimerCallback(timer_Elapsed), null, 100, 1000 * interval);
 		}
 
 		private void StopTimer()
 		{
 			//kill the timer
-			if(_timer != null)
+			if (_timer != null)
 			{
 				_timer.Dispose();
-				_timer= null;
+				_timer = null;
 			}
 		}
 
@@ -78,7 +76,7 @@ namespace Juicy.WindowsService
 		{
 			Log.DebugFormat("Time to execute task {0}" + this.Name);
 
-			if(!this.Enabled)
+			if (!this.Enabled)
 			{
 				Log.InfoFormat("Task {0} is disabled and will not execute." + this.Name);
 				return;
@@ -86,14 +84,14 @@ namespace Juicy.WindowsService
 
 			bool runTask = false;
 
-			lock(executingTasks)
+			lock (executingTasks)
 			{
 				bool stillRunning = executingTasks.Contains(this.Name);
 
 				//we don't want to have the same
 				// task executing more than once at
 				// the same time.
-				if(!stillRunning)
+				if (!stillRunning)
 				{
 					//not running... we can run it then.
 					runTask = true;
@@ -102,7 +100,7 @@ namespace Juicy.WindowsService
 
 			}
 
-			if(runTask)
+			if (runTask)
 			{
 				//--- no code here, please. Only inside the 'try' --//
 				try
@@ -111,7 +109,7 @@ namespace Juicy.WindowsService
 					this.Execute();
 					Log.DebugFormat("Completed task {0}.", this.Name);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					//we will log and supress this exception otherwise the
 					// whole windows service process comes crashing down
@@ -120,7 +118,7 @@ namespace Juicy.WindowsService
 				finally
 				{
 					//we need remove the finished task from the list
-					lock(executingTasks)
+					lock (executingTasks)
 					{
 						executingTasks.Remove(this.Name);
 					}

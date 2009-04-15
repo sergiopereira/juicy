@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace Juicy.WindowsService.UnitTest
@@ -12,7 +10,7 @@ namespace Juicy.WindowsService.UnitTest
 		[Test]
 		public void ShouldConfigurePeriodicalTaskWithDefaults()
 		{
-			
+
 			MockPeriodTask t = new MockPeriodTask();
 			Assert.AreEqual("MockPeriodTask", t.Name);
 			Assert.AreEqual(0, t.IntervalSeconds);

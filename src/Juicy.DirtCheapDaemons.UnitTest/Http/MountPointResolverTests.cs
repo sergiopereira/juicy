@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Juicy.DirtCheapDaemons.Http;
 using NUnit.Framework;
 
@@ -56,7 +54,7 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			mounts.Add(new MountPoint { Handler = null, VirtualPath = "/dir" });
 			mounts.Add(new MountPoint { Handler = null, VirtualPath = "/dir/subdir" });
 			mounts.Add(new MountPoint { Handler = null, VirtualPath = "/dir/subdir/subsub" });
-	
+
 			MountPoint mount = resolver.Resolve(mounts, "/dir/subdir");
 			Assert.IsNotNull(mount);
 			Assert.AreEqual("/dir/subdir", mount.VirtualPath);
@@ -73,7 +71,7 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			var mounts = new List<MountPoint>();
 			mounts.Add(new MountPoint { Handler = null, VirtualPath = "/dir" });
 			MountPoint mount = resolver.Resolve(mounts, "/non-existing-path");
-				Assert.IsNull(mount);			
+			Assert.IsNull(mount);
 		}
 
 		[Test]

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Juicy.WindowsService;
 
 namespace Juicy.WindowsService
 {
@@ -9,9 +5,9 @@ namespace Juicy.WindowsService
 	/// A task that doesn't do anything. It's useful as a placeholder or 
 	/// during tests.
 	/// </summary>
-	public class NullTask : BaseTask 
+	public class NullTask : BaseTask
 	{
-		readonly static log4net.ILog Log = 
+		readonly static log4net.ILog Log =
 			log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		public NullTask() : this("NullTask") { }

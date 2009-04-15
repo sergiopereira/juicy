@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Configuration;
 
 namespace Juicy.WindowsService
@@ -58,8 +57,8 @@ namespace Juicy.WindowsService
 
 	}
 
-	
-	[ConfigurationCollection(typeof(TaskSettings), AddItemName = "task")] 
+
+	[ConfigurationCollection(typeof(TaskSettings), AddItemName = "task")]
 	public class TaskSettingsCollection : ConfigurationElementCollection
 	{
 		public TaskSettings this[int index]
@@ -70,7 +69,7 @@ namespace Juicy.WindowsService
 			}
 			set
 			{
-				if(base.BaseGet(index) != null)
+				if (base.BaseGet(index) != null)
 				{
 					base.BaseRemoveAt(index);
 				}
@@ -80,7 +79,7 @@ namespace Juicy.WindowsService
 
 		new public TaskSettings this[string name]
 		{
-			get 
+			get
 			{
 				return this.BaseGet(name) as TaskSettings;
 			}
@@ -96,7 +95,7 @@ namespace Juicy.WindowsService
 			return ((TaskSettings)element).Name;
 		}
 
-		
-		
+
+
 	}
 }

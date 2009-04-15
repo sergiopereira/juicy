@@ -37,7 +37,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			get { return _portNumber; }
 			set
 			{
-				if(IsRunning)
+				if (IsRunning)
 				{
 					throw new InvalidOperationException("Cannot change the port number after the server has been started.");
 				}
@@ -46,38 +46,38 @@ namespace Juicy.DirtCheapDaemons.Http
 		}
 
 		public IList<MountPoint> MountPoints { get; private set; }
-        public string RootUrl { get { return string.Format("http://localhost:{0}/", PortNumber); } }
+		public string RootUrl { get { return string.Format("http://localhost:{0}/", PortNumber); } }
 
 		public void Mount(string virtualDir, string physicalDirectory)
 		{
-			Mount(virtualDir, new StaticFileHandler(physicalDirectory) );
+			Mount(virtualDir, new StaticFileHandler(physicalDirectory));
 		}
-	
-		public void Mount(string virtualDir, Action<IRequest,IResponse> handler)
+
+		public void Mount(string virtualDir, Action<IRequest, IResponse> handler)
 		{
 			Mount(virtualDir, new InlineHandler(handler));
 		}
 
-        public void Mount(string virtualDir, IMountPointHandler handler)
+		public void Mount(string virtualDir, IMountPointHandler handler)
 		{
-            MountPoints.Add(new MountPoint {VirtualPath = virtualDir, Handler = handler});
+			MountPoints.Add(new MountPoint { VirtualPath = virtualDir, Handler = handler });
 		}
 
-        public void Unmount(string virtualDir)
-        {
-            var mount = MountPoints.FirstOrDefault(m => m.VirtualPath.Equals(virtualDir, StringComparison.OrdinalIgnoreCase));
-            if(mount != null)
-            {
-                MountPoints.Remove(mount);
-            }
-        }
+		public void Unmount(string virtualDir)
+		{
+			var mount = MountPoints.FirstOrDefault(m => m.VirtualPath.Equals(virtualDir, StringComparison.OrdinalIgnoreCase));
+			if (mount != null)
+			{
+				MountPoints.Remove(mount);
+			}
+		}
 
-        public void UnmountAll()
-        {
-            MountPoints.Clear();
-        }
+		public void UnmountAll()
+		{
+			MountPoints.Clear();
+		}
 
-	    public void Start()
+		public void Start()
 		{
 			Shutdown();
 			var host = Dns.GetHostEntry("localhost");
@@ -89,15 +89,15 @@ namespace Juicy.DirtCheapDaemons.Http
 			_serverThread.Start();
 
 			Console.WriteLine("Juicy Web Server ready on port " + PortNumber + ". ");
-			
+
 		}
 
 		public void Shutdown()
 		{
-            if (_listener != null)
+			if (_listener != null)
 			{
-			    _listener.Stop();
-                _listener = null;
+				_listener.Stop();
+				_listener = null;
 			}
 
 			if (_serverThread != null)
@@ -143,7 +143,7 @@ namespace Juicy.DirtCheapDaemons.Http
 
 				bool result = response.StartsWith("PONG");
 				Console.WriteLine("Server at localhost:{0} is {1}", PortNumber, result ? "Online" : "Offline");
-				
+
 				return result;
 
 			}
@@ -170,7 +170,7 @@ namespace Juicy.DirtCheapDaemons.Http
 								socket.Close();
 								continue;
 							}
-							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+							string[] lines = reqText.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
 							//(starting n the next line is what a GET request looks like, line break = \r\n                                                
 							//GET /some/path/in/the/server.html HTTP/1.1
@@ -210,7 +210,7 @@ namespace Juicy.DirtCheapDaemons.Http
 								mount = FindHandler(vpath);
 								handler = mount.Handler;
 								Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
-								                  vpath, handler);
+												  vpath, handler);
 							}
 
 							var request = CreateRequest(lines, mount, vpath);
@@ -224,52 +224,55 @@ namespace Juicy.DirtCheapDaemons.Http
 					Thread.Sleep(50);
 				}
 			}
-			catch(SocketException)
+			catch (SocketException)
 			{
-				
+
 			}
 		}
 
 		private static Response CreateResponse(HttpStatusCode statusCode, string statusMessage)
-        {
-            var response = new Response
-                {
-                    StatusCode = statusCode,
-                    StatusMessage = statusMessage
-                };
+		{
+			var response = new Response
+				{
+					StatusCode = statusCode,
+					StatusMessage = statusMessage
+				};
 
-            //add some standard headers that can be replaced by 
-            // the handler if needed
+			//add some standard headers that can be replaced by 
+			// the handler if needed
 
-            response["Cache-Control"] = "private";
-	        response["Content-Type"] = "text/html; charset=utf-8";
-	        response["Server"] = "Juicy/1.0";
-	        response["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
-            
-            return response;
-        }
+			response["Cache-Control"] = "private";
+			response["Content-Type"] = "text/html; charset=utf-8";
+			response["Server"] = "Juicy/1.0";
+			response["Date"] = DateTime.UtcNow.ToString("ddd, d MMM yyyy HH:mm:ss 'GMT'");
+
+			return response;
+		}
 
 
 
-        private static Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
-        {
-            var request = new Request {MountPoint = mount, VirtualPath = vpath};
-            //copy the headers to the request object
-            requestLines.Skip(1).ToList().ForEach(line => {
-                    if (!string.IsNullOrEmpty(line)) {
-                        int pos = line.IndexOf(":");
-                        if (pos > 0) {
-							request[line.Substring(0, pos)] = line.Substring(pos + 1);
-                        }
-                    }
-                });
+		private static Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
+		{
+			var request = new Request { MountPoint = mount, VirtualPath = vpath };
+			//copy the headers to the request object
+			requestLines.Skip(1).ToList().ForEach(line =>
+			{
+				if (!string.IsNullOrEmpty(line))
+				{
+					int pos = line.IndexOf(":");
+					if (pos > 0)
+					{
+						request[line.Substring(0, pos)] = line.Substring(pos + 1);
+					}
+				}
+			});
 			if (vpath.IndexOf("?") >= 0)
 			{
 				var query = vpath.Substring(vpath.IndexOf("?"));
 				request.QueryString = HttpUtility.ParseQueryString(query);
 			}
-            return request;
-        }
+			return request;
+		}
 
 		private static string GetRequestText(Socket socket)
 		{
@@ -278,54 +281,54 @@ namespace Juicy.DirtCheapDaemons.Http
 			return Encoding.ASCII.GetString(bytes).TrimEnd('\0');
 		}
 
-        private static bool ValidateHttpVerb(string httpVerb)
-        {
-            //At present we will only deal with GET type
-            if (!httpVerb.Equals("GET", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine("Requested HTTP verb not supported.");
-                return false;
-            }
-
-            return true;
-        }
-
-        private MountPoint FindHandler(string requestedVirtualDir)
+		private static bool ValidateHttpVerb(string httpVerb)
 		{
-			return _resolver.Resolve(MountPoints, requestedVirtualDir) 
+			//At present we will only deal with GET type
+			if (!httpVerb.Equals("GET", StringComparison.OrdinalIgnoreCase))
+			{
+				Console.WriteLine("Requested HTTP verb not supported.");
+				return false;
+			}
+
+			return true;
+		}
+
+		private MountPoint FindHandler(string requestedVirtualDir)
+		{
+			return _resolver.Resolve(MountPoints, requestedVirtualDir)
 				??
 				new MountPoint { VirtualPath = "/", Handler = new ResourceNotFoundHandler() };
 		}
 
 		private void SendResponse(Response response, Socket socket)
 		{
-            socket.Send(Encoding.UTF8.GetBytes(
-                string.Format("HTTP/1.1 {0} {1}\r\n", (int)response.StatusCode, response.StatusMessage)
-                ));
-            
-            
-            string body = response.GetResponseBodyText();
-		    var buffer = Encoding.UTF8.GetBytes(body);
+			socket.Send(Encoding.UTF8.GetBytes(
+				string.Format("HTTP/1.1 {0} {1}\r\n", (int)response.StatusCode, response.StatusMessage)
+				));
+
+
+			string body = response.GetResponseBodyText();
+			var buffer = Encoding.UTF8.GetBytes(body);
 
 			response["Content-Length"] = buffer.Length.ToString();
-            SendAllHeaders(response, socket);
-		    
-            socket.Send(Encoding.UTF8.GetBytes("\r\n")); //end of headers
+			SendAllHeaders(response, socket);
 
-		    socket.Send(buffer);
+			socket.Send(Encoding.UTF8.GetBytes("\r\n")); //end of headers
+
+			socket.Send(buffer);
 		}
 
-        private static void SendAllHeaders(IResponse response, Socket socket)
-        {
-            foreach (var h in response.Headers) 
-            {
-                SendHeader(h.Key, h.Value, socket);
-            }
-        }
+		private static void SendAllHeaders(IResponse response, Socket socket)
+		{
+			foreach (var h in response.Headers)
+			{
+				SendHeader(h.Key, h.Value, socket);
+			}
+		}
 
-        private static void SendHeader(string name, string value, Socket socket)
-        {
-            socket.Send(Encoding.UTF8.GetBytes(string.Format("{0}: {1}\r\n", name, value)));
-        }
+		private static void SendHeader(string name, string value, Socket socket)
+		{
+			socket.Send(Encoding.UTF8.GetBytes(string.Format("{0}: {1}\r\n", name, value)));
+		}
 	}
 }

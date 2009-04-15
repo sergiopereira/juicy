@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Configuration;
 
 namespace Juicy.WindowsService
@@ -16,13 +14,13 @@ namespace Juicy.WindowsService
 		/// <param name="name"></param>
 		protected BaseTask(string name)
 		{
-			if(string.IsNullOrEmpty(name)) name = this.GetType().Name;
+			if (string.IsNullOrEmpty(name)) name = this.GetType().Name;
 
 			this.name = name;
 			Console.WriteLine(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
 			string sectionName = typeof(BaseTask).Namespace;
 			WindowsServiceConfiguration conf = ConfigurationManager.GetSection(sectionName) as WindowsServiceConfiguration;
-			if(conf == null)
+			if (conf == null)
 				throw new ConfigurationErrorsException("Could not find the mandatory <" + sectionName + " /> configuration section.");
 
 			this.settings = conf.TaskSettings[name];
@@ -33,7 +31,7 @@ namespace Juicy.WindowsService
 		/// </summary>
 		public virtual TaskSettings Settings { get { return settings; } }
 		private TaskSettings settings;
-	
+
 		/// <summary>
 		/// Indicates if the task is enabled (will run).
 		/// </summary>

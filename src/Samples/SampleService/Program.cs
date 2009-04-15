@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Juicy.WindowsService;
 using SampleService.Tasks;
-using System.Configuration;
-using Juicy.WindowsService;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 

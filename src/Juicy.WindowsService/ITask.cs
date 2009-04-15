@@ -5,7 +5,7 @@ namespace Juicy.WindowsService
 	/// <summary>
 	/// Defines the task objects that can be managed by the service
 	/// </summary>
-	public interface ITask: IDisposable
+	public interface ITask : IDisposable
 	{
 		bool Started { get; }
 		string Name { get; }

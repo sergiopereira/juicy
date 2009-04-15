@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 namespace Juicy
 {
@@ -15,7 +13,7 @@ namespace Juicy
 
 		}
 
-        public ResourceFinder(Assembly resourceAssembly,  string resourcesNamespace)
+		public ResourceFinder(Assembly resourceAssembly, string resourcesNamespace)
 		{
 			ResourceAssembly = resourceAssembly;
 			ResourcesNamespace = resourcesNamespace;
@@ -52,7 +50,7 @@ namespace Juicy
 			{
 				byte[] buffer = new byte[1000];
 				int length = resStream.Read(buffer, 0, buffer.Length);
-				while (length > 0) 
+				while (length > 0)
 				{
 					byte[] truncated = new byte[length];
 					Array.Copy(buffer, truncated, length);

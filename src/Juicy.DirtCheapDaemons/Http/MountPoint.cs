@@ -1,7 +1,7 @@
 ﻿
 namespace Juicy.DirtCheapDaemons.Http
 {
-    public class MountPoint
+	public class MountPoint
 	{
 
 		public IMountPointHandler Handler { get; set; }

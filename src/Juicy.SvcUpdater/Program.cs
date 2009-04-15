@@ -1,12 +1,10 @@
 using System;
-using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Configuration;
 using System.IO;
 using System.Management;
 using System.ServiceProcess;
-
 using Juicy.WindowsService.AutoUpdates;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "SvcUpdater.Log4Net.config", Watch = true)]
@@ -22,7 +20,7 @@ namespace Juicy.SvcUpdater
 		{
 			try
 			{
-				if(args.Length == 0)
+				if (args.Length == 0)
 				{
 					Console.WriteLine("Usage: SvcUpdater.exe [serviceName]");
 					return;
@@ -49,35 +47,35 @@ namespace Juicy.SvcUpdater
 				UpdateUtil upd = new UpdateUtil(updaterExePath);
 				List<string> updates = upd.GetUpdatedProgramFiles();
 				//remove files that only support the updater program
-				if(updates.Contains("svcupdater.exe.log4net.config")) updates.Remove("log4net.config");
-				if(updates.Contains("svcupdater.exe.config")) updates.Remove("svcupdater.config");
+				if (updates.Contains("svcupdater.exe.log4net.config")) updates.Remove("log4net.config");
+				if (updates.Contains("svcupdater.exe.config")) updates.Remove("svcupdater.config");
 
-				if(updates.Count > 0)
+				if (updates.Count > 0)
 				{
 					//stop the service
 					Log.Debug("Stopping " + serviceName);
 					string status = StopService(serviceName);
-					Log.InfoFormat("Result of stopping {0}: {1}", serviceName, status);						
+					Log.InfoFormat("Result of stopping {0}: {1}", serviceName, status);
 					System.Threading.Thread.Sleep(15000);
 
 					//wait until the OS shuts down the process
 					int count = 0;
-					while(true)
+					while (true)
 					{
 						count++;
 						IList list = System.Diagnostics.Process.GetProcessesByName(serviceExe);
-						if(list == null || list.Count == 0) break;
+						if (list == null || list.Count == 0) break;
 						Log.Debug("Waiting for service to shutdown");
 						System.Threading.Thread.Sleep(200);
 						//we may give up it takes too long (30 secs.)
-						if(count > 150) throw new ApplicationException("Service process did not shut down.");
+						if (count > 150) throw new ApplicationException("Service process did not shut down.");
 					}
 
 					try
 					{
 						List<string> keepThese = GetFilesToBeKept();
 						//	update and backup each new file
-						foreach(string f in updates)
+						foreach (string f in updates)
 						{
 							upd.UpdateFile(f, keepThese.Contains(f.ToLower()));
 						}
@@ -87,11 +85,11 @@ namespace Juicy.SvcUpdater
 						//let's try to leave with the service started
 						Log.Debug("Starting " + serviceName);
 						string st = StartService(serviceName);
-						Log.InfoFormat("Result of starting {0}: {1}", serviceName, st);						
+						Log.InfoFormat("Result of starting {0}: {1}", serviceName, st);
 					}
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Log.Error("Unhandled exception", ex);
 				Environment.Exit(1);//error reported 
@@ -101,7 +99,7 @@ namespace Juicy.SvcUpdater
 		private static string GetServiceExePath(string serviceName)
 		{
 			string wmiObj = "Win32_Service.name='" + serviceName + "'";
-			using(ManagementObject serviceInfo = new ManagementObject(wmiObj))
+			using (ManagementObject serviceInfo = new ManagementObject(wmiObj))
 			{
 				return serviceInfo.GetPropertyValue("PathName").ToString();
 			}
@@ -110,7 +108,7 @@ namespace Juicy.SvcUpdater
 		private static string StopService(string serviceName)
 		{
 			ServiceController svc = new ServiceController(serviceName);
-			if(svc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
+			if (svc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
 			{
 				svc.Stop();
 				svc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(15));
@@ -121,7 +119,7 @@ namespace Juicy.SvcUpdater
 		private static string StartService(string serviceName)
 		{
 			ServiceController svc = new ServiceController(serviceName);
-			if(svc.Status == System.ServiceProcess.ServiceControllerStatus.Stopped)
+			if (svc.Status == System.ServiceProcess.ServiceControllerStatus.Stopped)
 			{
 				svc.Start();
 				svc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(15));
@@ -135,7 +133,7 @@ namespace Juicy.SvcUpdater
 			int fileNumber = 1;
 			string fileName = ConfigurationManager.AppSettings["fileToKeep" + fileNumber];
 
-			while(!string.IsNullOrEmpty(fileName))
+			while (!string.IsNullOrEmpty(fileName))
 			{
 				Log.Debug("Will keep file: " + fileName);
 				list.Add(fileName.ToLower());

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using Juicy.WindowsService;
+﻿using Juicy.WindowsService;
 
 [assembly: ServiceRegistration(
 	SampleService.MyAppService.MyAppSvcName, // <-- just a constant string

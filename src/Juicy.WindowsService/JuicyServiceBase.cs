@@ -1,22 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
-using System.Threading;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-using System.Xml;
-using System.Text;
 
 namespace Juicy.WindowsService
 {
 	/// <summary>
 	/// Base class for Windows Services
 	/// </summary>
-	public class JuicyServiceBase: ServiceBase
+	public class JuicyServiceBase : ServiceBase
 	{
 		readonly static log4net.ILog Log =
 			log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -50,12 +42,12 @@ namespace Juicy.WindowsService
 		/// <summary>
 		/// Removes all the tasks that are being managed by the service
 		/// </summary>
-		public void ClearTasks() 
+		public void ClearTasks()
 		{
-			if(this.started)
+			if (this.started)
 				throw new InvalidOperationException("Cannot clear the tasks with the service started.");
 
-			tasks.Clear(); 
+			tasks.Clear();
 		}
 
 		private bool started;
@@ -69,7 +61,7 @@ namespace Juicy.WindowsService
 			{
 				Run(this);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Log.Warn("Service " + this.ServiceName + " did not handle exception.", ex);
 				throw;
@@ -83,9 +75,9 @@ namespace Juicy.WindowsService
 		public void RunAsStandAlone(params ITask[] tasksToRun)
 		{
 			//run each passed task once
-			foreach(ITask t in tasksToRun)
+			foreach (ITask t in tasksToRun)
 			{
-				using(t)
+				using (t)
 				{
 					t.Execute();
 				}
@@ -105,18 +97,18 @@ namespace Juicy.WindowsService
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
-		protected override void Dispose( bool disposing )
+		protected override void Dispose(bool disposing)
 		{
-			if( disposing )
+			if (disposing)
 			{
-				foreach(ITask m in tasks)
+				foreach (ITask m in tasks)
 					m.Dispose();
 
-				if (components != null) 
+				if (components != null)
 					components.Dispose();
 
 			}
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
 
@@ -162,18 +154,18 @@ namespace Juicy.WindowsService
 
 		private void StartBackgroundTasks()
 		{
-			foreach(ITask m in tasks)
+			foreach (ITask m in tasks)
 				m.Start();
 
 		}
 
 		private void StopBackgroundTasks()
 		{
-			foreach(ITask m in tasks)
+			foreach (ITask m in tasks)
 				m.Stop();
 		}
 
 
-		
+
 	}
 }

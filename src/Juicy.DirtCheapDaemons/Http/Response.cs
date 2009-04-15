@@ -5,10 +5,10 @@ using System.IO;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
-    public class Response : IResponse
+	public class Response : IResponse
 	{
 
-        public Response()
+		public Response()
 		{
 			Output = new StringWriter();
 			Headers = new Dictionary<string, string>();

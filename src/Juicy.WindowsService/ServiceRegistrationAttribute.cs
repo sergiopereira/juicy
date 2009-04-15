@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Juicy.WindowsService
 {
@@ -47,7 +45,7 @@ namespace Juicy.WindowsService
 			set { serviceDisplayName = value; }
 		}
 		private string serviceDisplayName;
-	
-	
+
+
 	}
 }

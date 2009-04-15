@@ -1,10 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using System.Configuration.Install;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace Juicy.WindowsService
 {
@@ -37,14 +33,14 @@ namespace Juicy.WindowsService
 		private void GetConfigData()
 		{
 
-			ServiceRegistrationAttribute[] atts = 
-				(ServiceRegistrationAttribute[]) this.GetType().Assembly.GetCustomAttributes(
+			ServiceRegistrationAttribute[] atts =
+				(ServiceRegistrationAttribute[])this.GetType().Assembly.GetCustomAttributes(
 					typeof(ServiceRegistrationAttribute), false
 					);
 
-			if(atts == null || atts.Length == 0)
-				throw new ApplicationException("Cannot install the service because the assembly " + 
-					this.GetType().Assembly.GetName().Name + " does not contain one attribute of type " + 
+			if (atts == null || atts.Length == 0)
+				throw new ApplicationException("Cannot install the service because the assembly " +
+					this.GetType().Assembly.GetName().Name + " does not contain one attribute of type " +
 					typeof(ServiceRegistrationAttribute).FullName + ".");
 
 			serviceDescription = atts[0].Description;
@@ -62,7 +58,7 @@ namespace Juicy.WindowsService
 				//...\<Service Name>
 				service,
 				//...\Parameters - this is where you can put service-specific configuration
-				config; 
+				config;
 
 			try
 			{
@@ -83,7 +79,7 @@ namespace Juicy.WindowsService
 				//(Optional) Add some custom information your service will use...
 				config = service.CreateSubKey("Parameters");
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Console.WriteLine("An exception was thrown during service installation:\n" + e.ToString());
 			}
@@ -107,7 +103,7 @@ namespace Juicy.WindowsService
 				service.DeleteSubKeyTree("Parameters");
 				//...
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Console.WriteLine("Exception encountered while uninstalling service:\n" + e.ToString());
 			}

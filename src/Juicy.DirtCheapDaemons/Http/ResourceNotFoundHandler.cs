@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
+﻿using System.Net;
 
 namespace Juicy.DirtCheapDaemons.Http
 {
@@ -13,7 +9,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			response.StatusCode = HttpStatusCode.NotFound;
 			response.StatusMessage = "Resource not found";
 			response.Output.WriteLine("<h1>404: The resource <i>{0}</i> could not be found.</h1>",
-			                          request.VirtualPath);
+									  request.VirtualPath);
 		}
 	}
 }
