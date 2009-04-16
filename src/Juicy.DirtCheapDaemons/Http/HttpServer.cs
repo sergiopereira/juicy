@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
-using System.IO;
 using System.Web;
 
 namespace Juicy.DirtCheapDaemons.Http
@@ -16,7 +15,7 @@ namespace Juicy.DirtCheapDaemons.Http
 		public const int DefaultPortNumber = 8081;
 		private TcpListener _listener;
 		private Thread _serverThread;
-		private MountPointResolver _resolver = new MountPointResolver();
+		private readonly MountPointResolver _resolver = new MountPointResolver();
 
 		public HttpServer()
 			: this(DefaultPortNumber)
@@ -88,7 +87,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			_serverThread = new Thread(WaitForConnection);
 			_serverThread.Start();
 
-			Console.WriteLine("Juicy Web Server ready on port " + PortNumber + ". ");
+			Console.WriteLine("Juicy Web Server ready at http://localhost:" + PortNumber + "/");
 
 		}
 
@@ -107,60 +106,17 @@ namespace Juicy.DirtCheapDaemons.Http
 			}
 		}
 
-		public bool Ping()
-		{
-			using (var cli = new TcpClient())
-			{
-				cli.Connect("localhost", PortNumber);
-				var startTime = DateTime.Now;
-				var elapsed = TimeSpan.Zero;
-				while (!cli.Connected && elapsed.TotalMilliseconds < 200)
-				{
-					Thread.Sleep(10);
-					elapsed = DateTime.Now - startTime;
-				}
-				if (!cli.Connected)
-				{
-					Console.WriteLine("Timeout trying to connect for Ping.");
-					return false;
-				}
-				var wr = new StreamWriter(cli.GetStream());
-				wr.Write("PING");
-				wr.Flush();
-				//wr.Close();
-
-				var rd = new StreamReader(cli.GetStream());
-				startTime = DateTime.Now;
-				elapsed = TimeSpan.Zero;
-				string response = "";
-
-				while (string.IsNullOrEmpty(response) && elapsed.TotalMilliseconds < 200)
-				{
-					Thread.Sleep(10);
-					elapsed = DateTime.Now - startTime;
-					response += rd.ReadToEnd();
-				}
-
-				bool result = response.StartsWith("PONG");
-				Console.WriteLine("Server at localhost:{0} is {1}", PortNumber, result ? "Online" : "Offline");
-
-				return result;
-
-			}
-		}
 
 		public void WaitForConnection()
 		{
 			try
 			{
-
-
 				while (true)
 				{
 					//Accept a new connection
 					using (var socket = _listener.AcceptSocket())
 					{
-						if (socket.Connected)
+						if(socket.Connected)
 						{
 							Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
 							string reqText = GetRequestText(socket);
@@ -170,7 +126,7 @@ namespace Juicy.DirtCheapDaemons.Http
 								socket.Close();
 								continue;
 							}
-							string[] lines = reqText.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
 
 							//(starting n the next line is what a GET request looks like, line break = \r\n                                                
 							//GET /some/path/in/the/server.html HTTP/1.1
@@ -184,34 +140,38 @@ namespace Juicy.DirtCheapDaemons.Http
 							//Connection: keep-alive
 							//Cookie: cookie1=val1; cookie2=val2;
 
-							MountPoint mount = null;
+							string vpath = "/";
 							IMountPointHandler handler;
-							string vpath = null;
+							MountPoint mount;
 
-							if (PingHandler.IsPing(reqText))
-							{
-								//this is not HTTP.. just our custom ping request
-								handler = new PingHandler();
-							}
-							else
+							string[] httpCommand = lines[0].Split(' ');
+
+							if (IdentifyHttpRequest(lines[0]))
 							{
 								//so this must be an HTTP request
-								string[] httpCommand = lines[0].Split(' ');
 								var httpVerb = httpCommand[0];
 								vpath = httpCommand[1];
 								Console.WriteLine("Requested path:" + vpath);
 
-								if (!ValidateHttpVerb(httpVerb))
+								if(!ValidateHttpVerb(httpVerb))
 								{
-									continue;
-									//TODO: return an error code here
+									handler = new EmptyHttpResponseHandler(HttpStatusCode.NotAcceptable, "Not acceptable");
+									mount = new MountPoint { Handler = handler, VirtualPath = vpath };
 								}
-
-								mount = FindHandler(vpath);
-								handler = mount.Handler;
-								Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
-												  vpath, handler);
+								else
+								{
+									mount = FindMount(vpath);
+									handler = mount.Handler;
+								}
 							}
+							else
+							{
+								handler = new EmptyHttpResponseHandler(HttpStatusCode.NotAcceptable, "Not acceptable");
+								mount = new MountPoint { Handler = handler, VirtualPath = vpath };
+							}
+
+							Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
+												  mount.VirtualPath, handler);
 
 							var request = CreateRequest(lines, mount, vpath);
 							var response = CreateResponse(HttpStatusCode.OK, "OK");
@@ -228,6 +188,12 @@ namespace Juicy.DirtCheapDaemons.Http
 			{
 
 			}
+		}
+
+		private bool IdentifyHttpRequest(string line)
+		{
+			var cmd = line.Split(' ');
+			return cmd.Length == 3 && cmd[2].StartsWith("HTTP", StringComparison.OrdinalIgnoreCase);
 		}
 
 		private static Response CreateResponse(HttpStatusCode statusCode, string statusMessage)
@@ -293,7 +259,7 @@ namespace Juicy.DirtCheapDaemons.Http
 			return true;
 		}
 
-		private MountPoint FindHandler(string requestedVirtualDir)
+		private MountPoint FindMount(string requestedVirtualDir)
 		{
 			return _resolver.Resolve(MountPoints, requestedVirtualDir)
 				??

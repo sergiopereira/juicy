@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\EmptyHttpResponseHandler.cs" />
     <Compile Include="Http\HttpServer.cs" />
     <Compile Include="Http\InlineHandler.cs" />
     <Compile Include="Http\IRequest.cs" />
@@ -50,7 +51,6 @@
     <Compile Include="Http\MountPoint.cs" />
     <Compile Include="Http\IMountPointHandler.cs" />
     <Compile Include="Http\MountPointResolver.cs" />
-    <Compile Include="Http\PingHandler.cs" />
     <Compile Include="Http\ResourceNotFoundHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Http\Request.cs" />
