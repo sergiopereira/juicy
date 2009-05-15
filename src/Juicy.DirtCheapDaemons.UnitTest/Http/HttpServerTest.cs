@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text;
+using System.Web;
 using Juicy.DirtCheapDaemons.Http;
 using NUnit.Framework;
+using System.Threading;
 
 namespace Juicy.DirtCheapDaemons.UnitTest.Http
 {
@@ -97,6 +100,32 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			Assert.AreEqual(2, count);
 		}
 
+		[Test]
+		public void ShouldAcceptPostRequestsWithUrlEncodedValues()
+		{
+			_server.Start();
+			const string text = "response here";
+			_server.Mount("/testdir", (i, o) => o.Output.Write(text));
+			string url = _server.RootUrl + "testdir";
+			Assert.AreEqual(text, GetResponseBodyFromUrlViaPost(url, 
+				"key1=val1&key2=val2", 
+				"application/x-www-form-urlencoded"));
+
+		}
+
+		[Test]
+		public void ShouldNotAcceptPostRequestsWithoutUrlEncodedValues()
+		{
+			_server.Start();
+			_server.Mount("/testdir", (i, o) => o.Output.Write("not important"));
+			string url = _server.RootUrl + "testdir";
+			Assert.AreEqual(HttpStatusCode.NotAcceptable, 
+				GetResponseStatusCodeViaPost(url,
+					"key1=val1&key2=val2",
+					"application/base64" // <-- bad encoding for our server
+					));
+		}
+
 
 
 		private static string GetResponseBodyFromUrl(string url)
@@ -107,8 +136,8 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			{
 				return sr.ReadToEnd();
 			}
-
 		}
+
 		private static HttpStatusCode GetResponseStatusCode(string url)
 		{
 			var request = WebRequest.Create(url);
@@ -124,5 +153,45 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 				return ((HttpWebResponse)ex.Response).StatusCode;
 			}
 		}
+
+		private static string GetResponseBodyFromUrlViaPost(string url, string postBody, string contentType)
+		{
+			var request = WebRequest.Create(url);
+			request.Method = "POST";
+			request.ContentType = contentType;
+			request.ContentLength = postBody.Length;
+			byte[] buffer = Encoding.ASCII.GetBytes(postBody);
+			request.GetRequestStream().Write(buffer, 0, buffer.Length);
+
+			using (var response = request.GetResponse())
+			using (var sr = new StreamReader(response.GetResponseStream()))
+			{
+				return sr.ReadToEnd();
+			}
+		}
+
+		private static HttpStatusCode GetResponseStatusCodeViaPost(string url, string postBody, string contentType)
+		{
+			var request = WebRequest.Create(url);
+			request.Method = "POST";
+			request.ContentType = contentType;
+			request.ContentLength = postBody.Length;
+			byte[] buffer = Encoding.ASCII.GetBytes(postBody);
+			request.GetRequestStream().Write(buffer, 0, buffer.Length);
+
+			try
+			{
+				using (var response = (HttpWebResponse)request.GetResponse())
+				{
+					return response.StatusCode;
+				}
+			}
+			catch (WebException ex)
+			{
+				return ((HttpWebResponse)ex.Response).StatusCode;
+			}
+		}
+
+		
 	}
 }

@@ -120,13 +120,16 @@ namespace Juicy.DirtCheapDaemons.Http
 						{
 							Console.WriteLine("\nRequest from IP {0}\n", socket.RemoteEndPoint);
 							string reqText = GetRequestText(socket);
+
 							if (string.IsNullOrEmpty(reqText))
 							{
 								Console.WriteLine("Empty request, canceling.");
 								socket.Close();
 								continue;
 							}
+
 							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+							string firstLine = lines[0];
 
 							//(starting n the next line is what a GET request looks like, line break = \r\n                                                
 							//GET /some/path/in/the/server.html HTTP/1.1
@@ -141,41 +144,50 @@ namespace Juicy.DirtCheapDaemons.Http
 							//Cookie: cookie1=val1; cookie2=val2;
 
 							string vpath = "/";
-							IMountPointHandler handler;
-							MountPoint mount;
+							//IMountPointHandler handler;
+							MountPoint mount = null;
 
-							string[] httpCommand = lines[0].Split(' ');
 
-							if (IdentifyHttpRequest(lines[0]))
+							if (CheckIfHttpRequest(firstLine))
 							{
+								string[] httpCommand = firstLine.Split(' ');
 								//so this must be an HTTP request
 								var httpVerb = httpCommand[0];
+
+								//a vpath must have been given in the command
 								vpath = httpCommand[1];
 								Console.WriteLine("Requested path:" + vpath);
 
-								if(!ValidateHttpVerb(httpVerb))
-								{
-									handler = new EmptyHttpResponseHandler(HttpStatusCode.NotAcceptable, "Not acceptable");
-									mount = new MountPoint { Handler = handler, VirtualPath = vpath };
-								}
-								else
+								if(ValidateHttpVerb(httpVerb))
 								{
 									mount = FindMount(vpath);
-									handler = mount.Handler;
 								}
 							}
-							else
+
+							if(mount == null)
 							{
-								handler = new EmptyHttpResponseHandler(HttpStatusCode.NotAcceptable, "Not acceptable");
-								mount = new MountPoint { Handler = handler, VirtualPath = vpath };
+								mount = CreateUnacceptableMountPoint(vpath);
 							}
 
 							Console.WriteLine("Request being handled at vpath: {0}, by handler: {1}",
-												  mount.VirtualPath, handler);
+												  mount.VirtualPath, mount.Handler);
 
-							var request = CreateRequest(lines, mount, vpath);
+							var request = new RequestFactory().Create(lines, mount, vpath);
 							var response = CreateResponse(HttpStatusCode.OK, "OK");
-							handler.Respond(request, response);
+
+							//But... we can't accept all kinds of posts just yet.. it's gotta be 
+							// simple forms... no file uploads and stuff
+							if (firstLine.StartsWith("POST ", StringComparison.OrdinalIgnoreCase))
+							{
+								if (!request.Headers.ContainsKey("Content-Type") 
+									||
+									!request.Headers["Content-Type"].Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
+								{
+									mount = CreateUnacceptableMountPoint(vpath);
+								}
+							}
+
+							mount.Handler.Respond(request, response);
 							SendResponse(response, socket);
 
 							socket.Close();
@@ -190,7 +202,13 @@ namespace Juicy.DirtCheapDaemons.Http
 			}
 		}
 
-		private bool IdentifyHttpRequest(string line)
+		private MountPoint CreateUnacceptableMountPoint(string vpath)
+		{
+			var handler = new EmptyHttpResponseHandler(HttpStatusCode.NotAcceptable, "Not acceptable");
+			return new MountPoint { Handler = handler, VirtualPath = vpath };
+		}
+
+		private bool CheckIfHttpRequest(string line)
 		{
 			var cmd = line.Split(' ');
 			return cmd.Length == 3 && cmd[2].StartsWith("HTTP", StringComparison.OrdinalIgnoreCase);
@@ -215,31 +233,6 @@ namespace Juicy.DirtCheapDaemons.Http
 			return response;
 		}
 
-
-
-		private static Request CreateRequest(IEnumerable<string> requestLines, MountPoint mount, string vpath)
-		{
-			var request = new Request { MountPoint = mount, VirtualPath = vpath };
-			//copy the headers to the request object
-			requestLines.Skip(1).ToList().ForEach(line =>
-			{
-				if (!string.IsNullOrEmpty(line))
-				{
-					int pos = line.IndexOf(":");
-					if (pos > 0)
-					{
-						request[line.Substring(0, pos)] = line.Substring(pos + 1);
-					}
-				}
-			});
-			if (vpath.IndexOf("?") >= 0)
-			{
-				var query = vpath.Substring(vpath.IndexOf("?"));
-				request.QueryString = HttpUtility.ParseQueryString(query);
-			}
-			return request;
-		}
-
 		private static string GetRequestText(Socket socket)
 		{
 			byte[] bytes = new byte[1024];
@@ -250,9 +243,13 @@ namespace Juicy.DirtCheapDaemons.Http
 		private static bool ValidateHttpVerb(string httpVerb)
 		{
 			//At present we will only deal with GET type
-			if (!httpVerb.Equals("GET", StringComparison.OrdinalIgnoreCase))
+			if (
+				!httpVerb.Equals("GET", StringComparison.OrdinalIgnoreCase)
+				&&
+				!httpVerb.Equals("POST", StringComparison.OrdinalIgnoreCase)
+				)
 			{
-				Console.WriteLine("Requested HTTP verb not supported.");
+				Console.WriteLine("Requested HTTP verb '{0}' not supported.", httpVerb);
 				return false;
 			}
 

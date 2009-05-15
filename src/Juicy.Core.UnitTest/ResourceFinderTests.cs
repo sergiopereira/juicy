@@ -16,7 +16,7 @@ namespace Juicy.Core.UnitTest
 		[Test]
 		public void ShouldFindResourceUsingTypeInSameNamespace()
 		{
-			var finder = new ResourceFinder(typeof(Resources.SomeClass));
+			var finder = new ResourceFinder(typeof(Resources.SomeClassInResourceNamespace));
 			Assert.IsTrue(finder.Exists("TextFile.txt"));
 			Assert.IsFalse(finder.Exists("Bogus.txt"));
 		}
@@ -24,7 +24,7 @@ namespace Juicy.Core.UnitTest
 		[Test]
 		public void ShouldGetResourceStream()
 		{
-			var finder = new ResourceFinder(typeof(Resources.SomeClass));
+			var finder = new ResourceFinder(typeof(Resources.SomeClassInResourceNamespace));
 			using (var s = finder.GetStream("TextFile.txt"))
 			{
 				Assert.IsNotNull(s);
@@ -38,7 +38,7 @@ namespace Juicy.Core.UnitTest
 		[Test]
 		public void ShouldGetResourceText()
 		{
-			var finder = new ResourceFinder(typeof(Resources.SomeClass));
+			var finder = new ResourceFinder(typeof(Resources.SomeClassInResourceNamespace));
 			Assert.AreEqual("test file", finder.GetText("TextFile.txt"));
 
 		}
@@ -46,7 +46,7 @@ namespace Juicy.Core.UnitTest
 		[Test]
 		public void ShouldGetResourceBytes()
 		{
-			var finder = new ResourceFinder(typeof(Resources.SomeClass));
+			var finder = new ResourceFinder(typeof(Resources.SomeClassInResourceNamespace));
 			byte[] resBytes = finder.GetBytes("TextFile.txt");
 			Assert.AreEqual(9, resBytes.Length);
 			Assert.AreEqual((byte)'t', resBytes[0]);

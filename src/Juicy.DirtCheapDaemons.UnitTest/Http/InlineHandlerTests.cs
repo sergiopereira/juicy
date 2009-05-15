@@ -1,5 +1,4 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Juicy.DirtCheapDaemons.Http;
 
 namespace Juicy.DirtCheapDaemons.UnitTest.Http

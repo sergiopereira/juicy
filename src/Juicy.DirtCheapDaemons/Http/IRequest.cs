@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace Juicy.DirtCheapDaemons.Http
@@ -7,7 +8,9 @@ namespace Juicy.DirtCheapDaemons.Http
 	{
 		MountPoint MountPoint { get; }
 		string VirtualPath { get; }
-		string this[string headerName] { get; }
-		NameValueCollection QueryString { get; }
+		string this[string headerName] { get; set; }
+		IDictionary<string, string> Headers { get; }
+		IDictionary<string, string> QueryString { get; }
+		IDictionary<string, string> Form { get; }
 	}
 }

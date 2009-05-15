@@ -40,12 +40,14 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Http\HttpServerTest.cs" />
     <Compile Include="Http\InlineHandlerTests.cs" />
     <Compile Include="Http\MountPointResolverTests.cs" />
+    <Compile Include="Http\RequestFactoryTests.cs" />
     <Compile Include="Http\StaticFileHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

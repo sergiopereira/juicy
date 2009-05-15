@@ -9,13 +9,16 @@ namespace Juicy.DirtCheapDaemons.Http
 		public Request()
 		{
 			Headers = new Dictionary<string, string>();
-			QueryString = new NameValueCollection();
+			QueryString = new Dictionary<string, string>();
+			Form = new Dictionary<string, string>();
 		}
 
-		public Dictionary<string, string> Headers { get; private set; }
 		public string this[string headerName] { get { return Headers[headerName]; } set { Headers[headerName] = value; } }
 		public MountPoint MountPoint { get; set; }
 		public string VirtualPath { get; set; }
-		public NameValueCollection QueryString { get; set; }
+
+		public IDictionary<string, string> Headers { get; private set; }
+		public IDictionary<string, string> QueryString { get; private set; }
+		public IDictionary<string, string> Form { get; private set; }
 	}
 }
