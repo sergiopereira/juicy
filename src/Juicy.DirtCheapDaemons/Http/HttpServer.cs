@@ -128,7 +128,7 @@ namespace Juicy.DirtCheapDaemons.Http
 								continue;
 							}
 
-							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+							string[] lines = reqText.Split(new[] {"\r\n"}, StringSplitOptions.None);
 							string firstLine = lines[0];
 
 							//(starting n the next line is what a GET request looks like, line break = \r\n                                                
@@ -176,11 +176,11 @@ namespace Juicy.DirtCheapDaemons.Http
 							var response = CreateResponse(HttpStatusCode.OK, "OK");
 
 							//But... we can't accept all kinds of posts just yet.. it's gotta be 
-							// simple forms... no file uploads and stuff
+							// simple form values or text body (no encoding)... no file uploads and stuff
 							if (firstLine.StartsWith("POST ", StringComparison.OrdinalIgnoreCase))
 							{
-								if (!request.Headers.ContainsKey("Content-Type") 
-									||
+								if (request.Headers.ContainsKey("Content-Type") 
+									&&
 									!request.Headers["Content-Type"].Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
 								{
 									mount = CreateUnacceptableMountPoint(vpath);

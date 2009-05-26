@@ -13,7 +13,7 @@ namespace Juicy.DirtCheapDaemons.Http
 
 			var request = new Request { MountPoint = mount, VirtualPath = vpath };
 
-			PopulateRequestFormValues(request, requestLines);
+			PopulateRequestPostedData(request, requestLines);
 			PopulateRequestHeaders(request, requestLines);
 			PopulateRequestQueryStringValues(request, vpath);
 
@@ -48,12 +48,23 @@ namespace Juicy.DirtCheapDaemons.Http
 			});
 		}
 
-		private void PopulateRequestFormValues(IRequest request, IEnumerable<string> requestLines)
+		private void PopulateRequestPostedData(IRequest request, IEnumerable<string> requestLines)
 		{
 			//copy the headers to the request object
 			var headerLines = requestLines.Skip(1).ToList();
+			int emptyLineIndex = 0;
 
-			if (headerLines.Count >= 2 && headerLines[headerLines.Count - 2] == "")
+			foreach(var line in headerLines)
+			{
+				if(line == "")
+					break;
+
+				emptyLineIndex++;
+			}
+
+			bool containsFormData = headerLines.Count(line => line.Contains("application/x-www-form-urlencoded")) > 0;
+
+			if (containsFormData && headerLines.Count >= 2 && (emptyLineIndex == headerLines.Count - 2))
 			{
 				//found the separator line between the headers and the
 				// form values
@@ -66,6 +77,22 @@ namespace Juicy.DirtCheapDaemons.Http
 				//remove the separator and the form values from the header lines
 				headerLines.RemoveAt(headerLines.Count - 1);
 				headerLines.RemoveAt(headerLines.Count - 1);
+			}
+
+			if(!containsFormData && (emptyLineIndex <= headerLines.Count-2))
+			{
+				//not posting form data, maybe just an unencoded body
+				string result = "";
+				for(int i=emptyLineIndex+1; i<headerLines.Count; i++)
+				{
+					result += headerLines[i];
+					if(i<headerLines.Count-1)
+					{
+						result += Environment.NewLine;
+					}
+				}
+
+				request.PostBody = result;
 			}
 		}
 

@@ -50,7 +50,8 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		{
 			var lines = new[]
 			            	{
-			            		"(doesn't matter)",
+                                "(not important, the HTTP command",
+			            		"Content-Type: application/x-www-form-urlencoded",
                                 "", //separate headers from posted values
                                 "key1=value+1&key2=value+2"
 			            	};

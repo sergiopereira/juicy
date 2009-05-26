@@ -114,7 +114,21 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		}
 
 		[Test]
-		public void ShouldNotAcceptPostRequestsWithoutUrlEncodedValues()
+		public void ShouldAcceptPostRequestsWithSimplePostBody()
+		{
+			_server.Start();
+			const string text = "response here";
+			_server.Mount("/testdir", (i, o) => o.Output.Write(text));
+
+			string url = _server.RootUrl + "testdir";
+			string body = "line1\r\nline2\r\nline3";
+			
+			Assert.AreEqual(text, GetResponseBodyFromUrlViaPost(url, body, null));
+
+		}
+
+		[Test]
+		public void ShouldNotAcceptPostRequestsWithUnspportedContentTypes()
 		{
 			_server.Start();
 			_server.Mount("/testdir", (i, o) => o.Output.Write("not important"));
@@ -122,7 +136,7 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 			Assert.AreEqual(HttpStatusCode.NotAcceptable, 
 				GetResponseStatusCodeViaPost(url,
 					"key1=val1&key2=val2",
-					"application/base64" // <-- bad encoding for our server
+					"application/base64" // <-- bad format for our server
 					));
 		}
 
@@ -158,7 +172,10 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		{
 			var request = WebRequest.Create(url);
 			request.Method = "POST";
-			request.ContentType = contentType;
+			if(!string.IsNullOrEmpty(contentType))
+			{
+				request.ContentType = contentType;
+			}
 			request.ContentLength = postBody.Length;
 			byte[] buffer = Encoding.ASCII.GetBytes(postBody);
 			request.GetRequestStream().Write(buffer, 0, buffer.Length);

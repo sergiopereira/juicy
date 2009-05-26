@@ -16,6 +16,7 @@ namespace Juicy.DirtCheapDaemons.Http
 		public string this[string headerName] { get { return Headers[headerName]; } set { Headers[headerName] = value; } }
 		public MountPoint MountPoint { get; set; }
 		public string VirtualPath { get; set; }
+		public string PostBody { get; set; }
 
 		public IDictionary<string, string> Headers { get; private set; }
 		public IDictionary<string, string> QueryString { get; private set; }
