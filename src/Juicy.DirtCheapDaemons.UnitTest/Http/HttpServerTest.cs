@@ -127,21 +127,6 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 
 		}
 
-		[Test]
-		public void ShouldNotAcceptPostRequestsWithUnspportedContentTypes()
-		{
-			_server.Start();
-			_server.Mount("/testdir", (i, o) => o.Output.Write("not important"));
-			string url = _server.RootUrl + "testdir";
-			Assert.AreEqual(HttpStatusCode.NotAcceptable, 
-				GetResponseStatusCodeViaPost(url,
-					"key1=val1&key2=val2",
-					"application/base64" // <-- bad format for our server
-					));
-		}
-
-
-
 		private static string GetResponseBodyFromUrl(string url)
 		{
 			var request = WebRequest.Create(url);

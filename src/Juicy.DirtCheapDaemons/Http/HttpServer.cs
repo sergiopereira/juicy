@@ -175,18 +175,6 @@ namespace Juicy.DirtCheapDaemons.Http
 							var request = new RequestFactory().Create(lines, mount, vpath);
 							var response = CreateResponse(HttpStatusCode.OK, "OK");
 
-							//But... we can't accept all kinds of posts just yet.. it's gotta be 
-							// simple form values or text body (no encoding)... no file uploads and stuff
-							if (firstLine.StartsWith("POST ", StringComparison.OrdinalIgnoreCase))
-							{
-								if (request.Headers.ContainsKey("Content-Type") 
-									&&
-									!request.Headers["Content-Type"].Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
-								{
-									mount = CreateUnacceptableMountPoint(vpath);
-								}
-							}
-
 							mount.Handler.Respond(request, response);
 							SendResponse(response, socket);
 
