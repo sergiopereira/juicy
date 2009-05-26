@@ -225,7 +225,8 @@ namespace Juicy.DirtCheapDaemons.Http
 		{
 			byte[] bytes = new byte[1024];
 			socket.Receive(bytes, bytes.Length, 0);
-			return Encoding.ASCII.GetString(bytes).TrimEnd('\0');
+			string data = Encoding.ASCII.GetString(bytes);			
+			return data.TrimEnd('\0');
 		}
 
 		private static bool ValidateHttpVerb(string httpVerb)

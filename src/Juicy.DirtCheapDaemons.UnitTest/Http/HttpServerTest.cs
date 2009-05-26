@@ -105,11 +105,23 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		{
 			_server.Start();
 			const string text = "response here";
-			_server.Mount("/testdir", (i, o) => o.Output.Write(text));
+			string key1 = null, key2 = null;
+
+			_server.Mount("/testdir", (i, o) =>
+				{
+					//key1 = i.Form["key1"];
+					//key2 = i.Form["key2"];
+					o.Output.Write(text);
+				});
+
 			string url = _server.RootUrl + "testdir";
+			
 			Assert.AreEqual(text, GetResponseBodyFromUrlViaPost(url, 
 				"key1=val1&key2=val2", 
 				"application/x-www-form-urlencoded"));
+			
+			Assert.AreEqual("val1", key1);
+			Assert.AreEqual("val2", key2);
 
 		}
 
@@ -117,13 +129,13 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 		public void ShouldAcceptPostRequestsWithSimplePostBody()
 		{
 			_server.Start();
-			const string text = "response here";
-			_server.Mount("/testdir", (i, o) => o.Output.Write(text));
+			//const string text = "response here";
+			_server.Mount("/testdir", (i, o) => o.Output.Write(i.PostBody));
 
 			string url = _server.RootUrl + "testdir";
 			string body = "line1\r\nline2\r\nline3";
 			
-			Assert.AreEqual(text, GetResponseBodyFromUrlViaPost(url, body, null));
+			Assert.AreEqual(body, GetResponseBodyFromUrlViaPost(url, body, null));
 
 		}
 
@@ -155,15 +167,24 @@ namespace Juicy.DirtCheapDaemons.UnitTest.Http
 
 		private static string GetResponseBodyFromUrlViaPost(string url, string postBody, string contentType)
 		{
+			byte[] buffer = Encoding.UTF8.GetBytes(postBody);
 			var request = WebRequest.Create(url);
 			request.Method = "POST";
+			//ServicePointManager.Expect100Continue = false;
+
 			if(!string.IsNullOrEmpty(contentType))
 			{
 				request.ContentType = contentType;
 			}
-			request.ContentLength = postBody.Length;
-			byte[] buffer = Encoding.ASCII.GetBytes(postBody);
-			request.GetRequestStream().Write(buffer, 0, buffer.Length);
+
+			request.ContentLength = buffer.Length;
+
+			var stream = request.GetRequestStream();
+			
+			stream.Write(buffer, 0, buffer.Length);
+			stream.Flush();
+			stream.Close();
+		
 
 			using (var response = request.GetResponse())
 			using (var sr = new StreamReader(response.GetResponseStream()))
