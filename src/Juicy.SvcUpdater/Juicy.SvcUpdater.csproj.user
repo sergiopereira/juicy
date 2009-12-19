@@ -6,6 +6,6 @@
     <StartWorkingDirectory>C:\Projects\Service\VHMS\deployment\vhms-service\bin\</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup>
-    <ReferencePath>C:\$ergio\projects\Juicy\lib\</ReferencePath>
+    <ReferencePath>C:\@projects\juicy\lib\</ReferencePath>
   </PropertyGroup>
 </Project>
